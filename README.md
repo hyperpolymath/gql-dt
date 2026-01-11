@@ -115,4 +115,5 @@ See [spec/normalization-types.md](spec/normalization-types.md) for normalization
 - [FormDB](https://github.com/hyperpolymath/formdb) - The narrative-first database
 - [FormDB Self-Normalizing Spec](https://github.com/hyperpolymath/formdb/blob/main/spec/self-normalizing.adoc) - Self-normalizing database specification
 - [FormDB Studio](https://github.com/hyperpolymath/formdb-studio) - Zero-friction GUI for FQLdt
-- [BoFIG](https://github.com/hyperpolymath/bofig) - Binary-Origami Figuration (journalism use case)
+- [BoFIG](https://github.com/hyperpolymath/bofig) - Evidence graph for investigative journalism
+- [Zotero-FormDB](https://github.com/hyperpolymath/zotero-formdb) - Production pilot: reference manager with PROMPT scores

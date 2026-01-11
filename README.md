@@ -119,3 +119,4 @@ See [spec/normalization-types.md](spec/normalization-types.md) for normalization
 - [FormDB Studio](https://github.com/hyperpolymath/formdb-studio) - Zero-friction GUI for FQLdt
 - [BoFIG](https://github.com/hyperpolymath/bofig) - Evidence graph for investigative journalism
 - [Zotero-FormDB](https://github.com/hyperpolymath/zotero-formdb) - Production pilot: reference manager with PROMPT scores
+- [FormDB Debugger](https://github.com/hyperpolymath/formdb-debugger) - Proof-carrying database debugger (Lean 4 + Idris 2)

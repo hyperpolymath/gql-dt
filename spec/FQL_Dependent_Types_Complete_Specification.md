@@ -58,6 +58,10 @@ FQL with dependent types can be implemented in:
 
 **Recommendation**: Lean 4 (best LSP support, large proof library).
 
+### 1.4 Related Specifications
+
+- **[Normalization Types](normalization-types.md)**: Extends this specification with type-encoded functional dependencies, normal form predicates (1NF through BCNF), and proof-carrying schema evolution. Integrates with FormDB's self-normalizing database feature.
+
 ---
 
 ## 2. Type System

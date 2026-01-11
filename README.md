@@ -42,6 +42,7 @@ FQLdt extends [FormDB](https://github.com/hyperpolymath/formdb)'s query language
 - **Dependent Types**: Length-indexed vectors, provenance-tracked values
 - **Proof Obligations**: Compile-time verification of constraints
 - **Reversibility Proofs**: Prove operations have inverses before execution
+- **Normalization Types**: Type-encoded functional dependencies, normal form predicates (1NF-BCNF), proof-carrying schema evolution
 - **Backward Compatible**: Standard FQL is valid in dependent-type mode
 
 ## Zig FFI (Bidirectional)
@@ -88,6 +89,14 @@ See [spec/FQL_Dependent_Types_Complete_Specification.md](spec/FQL_Dependent_Type
 5. Proof obligations and tactics
 6. Complete examples (BoFIG journalism use case)
 
+See [spec/normalization-types.md](spec/normalization-types.md) for normalization types covering:
+
+1. Functional dependency encoding (FunDep, Armstrong's Axioms)
+2. Normal form predicates (1NF, 2NF, 3NF, BCNF, 4NF)
+3. Proof-carrying schema evolution (NormalizationStep)
+4. Integration with Form.Normalizer
+5. FQL syntax extensions for normalization commands
+
 ## Setup
 
 1. Ensure `just` and `podman` are installed
@@ -99,9 +108,11 @@ See [spec/FQL_Dependent_Types_Complete_Specification.md](spec/FQL_Dependent_Type
 - **Phase 1** (Month 1-6): Refinement types
 - **Phase 2** (Month 7-12): Simple dependent types
 - **Phase 3** (Month 13-18): Full verification
+- **Phase 4** (Month 19-24): Normalization types (FunDep, normal forms, proof-carrying evolution)
 
 ## See Also
 
 - [FormDB](https://github.com/hyperpolymath/formdb) - The narrative-first database
+- [FormDB Self-Normalizing Spec](https://github.com/hyperpolymath/formdb/blob/main/spec/self-normalizing.adoc) - Self-normalizing database specification
 - [FormDB Studio](https://github.com/hyperpolymath/formdb-studio) - Zero-friction GUI for FQLdt
 - [BoFIG](https://github.com/hyperpolymath/bofig) - Binary-Origami Figuration (journalism use case)

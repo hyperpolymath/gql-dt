@@ -48,6 +48,43 @@ FQLdt extends [FormDB](https://github.com/hyperpolymath/formdb)'s query language
 - **Normalization Types**: Type-encoded functional dependencies, normal form predicates (1NF-BCNF), proof-carrying schema evolution
 - **Backward Compatible**: Standard FQL is valid in dependent-type mode
 
+## Current Status
+
+**Build Status**: 34/35 modules compiling (97% success) - Updated 2026-02-01
+
+**Completed Milestones**:
+- ✅ M1: Lean 4 project setup (v4.15.0 + Mathlib)
+- ✅ M2: Core refinement types (BoundedNat, BoundedInt, NonEmptyString, Confidence)
+- ✅ M3: PROMPT score types (PromptDimension, PromptScores with auto-computed overall)
+- ✅ M4: Provenance tracking (ActorId, Rationale, Tracked with proofs)
+- ✅ M5: Specifications (EBNF grammar, lexical spec, railroad diagrams)
+- 🟡 M6: FBQLdt/FBQL Parser (substantially complete - see below)
+
+**M6 Parser Status** (Substantially Complete):
+- ✅ Lexer: Hand-rolled 540-line implementation (80+ keywords, operators, literals, comments)
+- ✅ Parser: Combinator-based parser for INSERT/SELECT/UPDATE/DELETE
+- ✅ Type System: Refinement types, PROMPT scores, provenance tracking
+- ✅ Pipeline: 6-stage compilation (tokenize → parse → type check → IR → validate → serialize)
+- ✅ Serialization: CBOR encoding/decoding (RFC 8949), JSON support
+- ✅ Documentation: 8 comprehensive docs (seam analysis, integration, language bindings, etc.)
+- ✅ Infrastructure: Containerfile, Dockerfile, CI/CD workflow
+- ⚠️  AST.lean: 1 nested inductive type issue (requires restructuring)
+
+**Recent Updates** (2026-02-01):
+- Seam analysis: Fixed 76 issues, resolved 33 compilation blockers
+- Namespace consistency: Global FqlDt → FbqlDt renaming across 24 files
+- Circular dependency: Created Serialization/Types.lean to break IR ↔ Serialization cycle
+- CBOR tags: Updated to vendor-specific range (55800-55804) to avoid IANA collisions
+- Lexer rewrite: Complete hand-rolled implementation (Parsec unavailable in Lean 4.15.0)
+
+**Next Steps**:
+- Fix AST.lean nested inductive issue (TypedValue/Tracked relationship)
+- Achieve 35/35 modules compiling (100% build success)
+- Start M7 (Idris2 ABI) + M8 (Zig FFI) in parallel
+- M9: ReScript bindings (HIGHEST PRIORITY after M7+M8)
+
+For detailed progress tracking, see [.machine_readable/STATE.scm](.machine_readable/STATE.scm).
+
 ## Zig FFI (Bidirectional)
 
 FQLdt compiles to operations on Form.Bridge, which uses Zig's stable ABI:

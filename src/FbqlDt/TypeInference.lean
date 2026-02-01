@@ -10,7 +10,7 @@ import FbqlDt.TypeSafe
 
 namespace FbqlDt.TypeInference
 
-open AST Types
+open AST Types TypeSafe
 
 /-!
 # Type Inference for FBQL
@@ -47,7 +47,7 @@ RATIONALE "Official statistics";
 -- Literal Type Inference
 -- ============================================================================
 
-/-- InferredType moved to AST.lean to avoid circular dependencies -/
+-- InferredType moved to AST.lean to avoid circular dependencies
 
 /-- Result of type inference -/
 structure InferenceResult where
@@ -202,11 +202,11 @@ def inferInsert
   -- 1. Find schema
   let schemaTable? := schema.columns.isEmpty  -- TODO: Real schema lookup
   if schemaTable? then
-    return .error s!"Table {table} not found in schema"
+    throw s!"Table {table} not found in schema"
 
   -- 2. Check column count matches
   if columns.length ≠ values.length then
-    return .error s!"Column count ({columns.length}) doesn't match value count ({values.length})"
+    throw s!"Column count ({columns.length}) doesn't match value count ({values.length})"
 
   -- 3. Infer type for each value based on column
   let mut inferredValues : List InferenceResult := []
@@ -217,14 +217,14 @@ def inferInsert
     -- Find column in schema
     let col? := schema.columns.find? (·.name = colName)
     match col? with
-    | none => return .error s!"Column {colName} not found in schema"
+    | none => throw s!"Column {colName} not found in schema"
     | some col =>
         -- Infer type from schema
         let inferred ← inferTypeFromSchema col.type value
         inferredValues := inferred :: inferredValues
 
   -- 4. Return inferred INSERT
-  .ok {
+  return {
     table := table,
     columns := columns,
     inferredValues := inferredValues.reverse,
@@ -266,8 +266,8 @@ def runtimeValidate (result : InferenceResult) : Bool :=
 def runtimeValidateInsert (insert : InferredInsert) : Except String Unit := do
   for result in insert.inferredValues do
     if !runtimeValidate result then
-      return .error s!"Runtime validation failed for {result.inferredType}"
-  .ok ()
+      throw s!"Runtime validation failed for {result.inferredType}"
+  return ()
 
 -- ============================================================================
 -- Examples

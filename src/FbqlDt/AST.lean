@@ -30,6 +30,21 @@ inductive InferredType where
   | float : Float → InferredType
   deriving Repr
 
+-- ToString instance for InferredType
+def inferredTypeToString : InferredType → String
+  | .nat n => s!"Nat({n})"
+  | .int i => s!"Int({i})"
+  | .string s => s!"String(\"{s}\")"
+  | .bool b => s!"Bool({b})"
+  | .float f => s!"Float({f})"
+
+instance : ToString InferredType where
+  toString := inferredTypeToString
+
+-- Inhabited instance for InferredType (default: nat 0)
+instance : Inhabited InferredType where
+  default := .nat 0
+
 -- ============================================================================
 -- Core Type Definitions (Ordered by Dependencies)
 -- ============================================================================
@@ -53,7 +68,7 @@ inductive TypeExpr where
   | vector : TypeExpr → Nat → TypeExpr
   | promptScores : TypeExpr
   -- Note: Provenance tracking via TrackedValue wrapper, not a type constructor
-  deriving Repr
+  deriving Repr, BEq
 
 -- ToString instance for TypeExpr
 def typeExprToString : TypeExpr → String

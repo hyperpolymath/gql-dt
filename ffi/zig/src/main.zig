@@ -35,7 +35,7 @@ var gpa = std.heap.GeneralPurposeAllocator(.{}){};
 
 /// Initialize FBQLdt library
 /// CRITICAL: Pure ABI bridge - delegates to Idris2 for actual initialization
-export fn fbqldt_init() callconv(.C) i32 {
+export fn fbqldt_init() callconv(.c) i32 {
     if (initialized) return @intFromEnum(Status.ok);
 
     // TODO: Call Idris2 initialization function
@@ -47,7 +47,7 @@ export fn fbqldt_init() callconv(.C) i32 {
 }
 
 /// Cleanup FBQLdt library
-export fn fbqldt_cleanup() callconv(.C) void {
+export fn fbqldt_cleanup() callconv(.c) void {
     if (!initialized) return;
 
     // TODO: Call Idris2 cleanup function
@@ -67,7 +67,7 @@ export fn fbqldt_db_open(
     path: [*:0]const u8,
     path_len: u64,
     db_out: *?*FbqldtDb,
-) callconv(.C) i32 {
+) callconv(.c) i32 {
     if (!initialized) return @intFromEnum(Status.internal_error);
     if (path_len == 0) return @intFromEnum(Status.invalid_arg);
     if (path_len > 4096) return @intFromEnum(Status.invalid_arg);
@@ -84,7 +84,7 @@ export fn fbqldt_db_open(
 }
 
 /// Close database
-export fn fbqldt_db_close(db: *FbqldtDb) callconv(.C) i32 {
+export fn fbqldt_db_close(db: *FbqldtDb) callconv(.c) i32 {
     if (!initialized) return @intFromEnum(Status.internal_error);
 
     // TODO: Call Idris2 db_close function
@@ -104,7 +104,7 @@ export fn fbqldt_parse(
     query_str: [*:0]const u8,
     query_len: u64,
     query_out: *?*FbqldtQuery,
-) callconv(.C) i32 {
+) callconv(.c) i32 {
     if (!initialized) return @intFromEnum(Status.internal_error);
     if (query_len == 0) return @intFromEnum(Status.invalid_arg);
     if (query_len > 1_000_000) return @intFromEnum(Status.invalid_arg); // 1MB query limit
@@ -125,7 +125,7 @@ export fn fbqldt_parse_inferred(
     query_len: u64,
     schema: *FbqldtSchema,
     query_out: *?*FbqldtQuery,
-) callconv(.C) i32 {
+) callconv(.c) i32 {
     if (!initialized) return @intFromEnum(Status.internal_error);
     if (query_len == 0) return @intFromEnum(Status.invalid_arg);
     if (query_len > 1_000_000) return @intFromEnum(Status.invalid_arg);
@@ -145,7 +145,7 @@ export fn fbqldt_parse_inferred(
 export fn fbqldt_typecheck(
     query: *FbqldtQuery,
     schema: *FbqldtSchema,
-) callconv(.C) i32 {
+) callconv(.c) i32 {
     if (!initialized) return @intFromEnum(Status.internal_error);
 
     // TODO: Call Idris2 typecheck function
@@ -167,7 +167,7 @@ export fn fbqldt_execute(
     db: *FbqldtDb,
     query: *FbqldtQuery,
     result_out: *?*FbqldtResult,
-) callconv(.C) i32 {
+) callconv(.c) i32 {
     if (!initialized) return @intFromEnum(Status.internal_error);
 
     // TODO: Call Idris2 execute function
@@ -190,7 +190,7 @@ export fn fbqldt_serialize_cbor(
     buffer: [*]u8,
     buffer_len: u64,
     written_out: *u64,
-) callconv(.C) i32 {
+) callconv(.c) i32 {
     if (!initialized) return @intFromEnum(Status.internal_error);
     if (buffer_len == 0) return @intFromEnum(Status.invalid_arg);
 
@@ -210,7 +210,7 @@ export fn fbqldt_serialize_json(
     buffer: [*]u8,
     buffer_len: u64,
     written_out: *u64,
-) callconv(.C) i32 {
+) callconv(.c) i32 {
     if (!initialized) return @intFromEnum(Status.internal_error);
     if (buffer_len == 0) return @intFromEnum(Status.invalid_arg);
 
@@ -228,7 +228,7 @@ export fn fbqldt_deserialize_cbor(
     buffer: [*]const u8,
     buffer_len: u64,
     query_out: *?*FbqldtQuery,
-) callconv(.C) i32 {
+) callconv(.c) i32 {
     if (!initialized) return @intFromEnum(Status.internal_error);
     if (buffer_len == 0) return @intFromEnum(Status.invalid_arg);
     if (buffer_len > 10_000_000) return @intFromEnum(Status.invalid_arg); // 10MB CBOR limit
@@ -250,7 +250,7 @@ export fn fbqldt_get_schema(
     db: *FbqldtDb,
     collection_name: [*:0]const u8,
     schema_out: *?*FbqldtSchema,
-) callconv(.C) i32 {
+) callconv(.c) i32 {
     if (!initialized) return @intFromEnum(Status.internal_error);
 
     // TODO: Call Idris2 get_schema function
@@ -271,7 +271,7 @@ export fn fbqldt_validate_permissions(
     query: *FbqldtQuery,
     user_id: [*:0]const u8,
     permissions: *const anyopaque,
-) callconv(.C) i32 {
+) callconv(.c) i32 {
     if (!initialized) return @intFromEnum(Status.internal_error);
 
     // TODO: Call Idris2 validate_permissions function
@@ -288,7 +288,7 @@ export fn fbqldt_validate_permissions(
 ////////////////////////////////////////////////////////////////////////////////
 
 /// Free query handle
-export fn fbqldt_query_free(query: *FbqldtQuery) callconv(.C) void {
+export fn fbqldt_query_free(query: *FbqldtQuery) callconv(.c) void {
     if (!initialized) return;
 
     // TODO: Call Idris2 query_free function
@@ -298,7 +298,7 @@ export fn fbqldt_query_free(query: *FbqldtQuery) callconv(.C) void {
 }
 
 /// Free schema handle
-export fn fbqldt_schema_free(schema: *FbqldtSchema) callconv(.C) void {
+export fn fbqldt_schema_free(schema: *FbqldtSchema) callconv(.c) void {
     if (!initialized) return;
 
     // TODO: Call Idris2 schema_free function

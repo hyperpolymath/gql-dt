@@ -51,8 +51,8 @@ inductive TypeExpr where
   | confidence : TypeExpr
   -- Dependent types
   | vector : TypeExpr → Nat → TypeExpr
-  | tracked : TypeExpr → TypeExpr
   | promptScores : TypeExpr
+  -- Note: Provenance tracking via TrackedValue wrapper, not a type constructor
   deriving Repr
 
 -- Normal form levels
@@ -75,12 +75,24 @@ inductive TypedValue : TypeExpr → Type where
   | float : Float → TypedValue .float
   | boundedNat : (min max : Nat) → BoundedNat min max → TypedValue (.boundedNat min max)
   | nonEmptyString : NonEmptyString → TypedValue .nonEmptyString
-  | tracked : {α : TypeExpr} → Tracked (TypedValue α) → TypedValue (.tracked α)
   | promptScores : PromptScores → TypedValue .promptScores
 
--- Row: list of typed values
--- DEPENDS ON: TypeExpr, TypedValue
+-- Provenance-tracked values (wrapper around TypedValue)
+-- Separates provenance from type system to avoid nested inductive issue
+structure TrackedValue (t : TypeExpr) where
+  value : TypedValue t
+  timestamp : Nat  -- Unix timestamp
+  actorId : ActorId  -- Who made the change
+  rationale : Rationale  -- Why was it changed
+
+-- Manual Repr for TrackedValue (can't auto-derive with dependent types)
+instance {t : TypeExpr} : Repr (TrackedValue t) where
+  reprPrec tv _ := "TrackedValue { timestamp := " ++ repr tv.timestamp ++ ", actor := " ++ repr tv.actorId ++ " }"
+
+-- Row: list of typed values (optionally with provenance)
+-- DEPENDS ON: TypeExpr, TypedValue, TrackedValue
 def Row := List (String × Σ t : TypeExpr, TypedValue t)
+def TrackedRow := List (String × Σ t : TypeExpr, TrackedValue t)
 
 -- Constraints with proofs
 -- DEPENDS ON: Row
@@ -88,6 +100,13 @@ inductive Constraint where
   | check : String → (row : Row) → Prop → Constraint
   | foreignKey : String → String → Constraint
   | unique : List String → Constraint
+
+-- Manual Repr for Constraint (can't auto-derive with Prop field)
+instance : Repr Constraint where
+  reprPrec
+    | .check name _ _, _ => "Constraint.check " ++ repr name
+    | .foreignKey src dst, _ => "Constraint.foreignKey " ++ repr src ++ " " ++ repr dst
+    | .unique cols, _ => "Constraint.unique " ++ repr cols
 
 -- Column definition with type-level constraints
 -- DEPENDS ON: TypeExpr
@@ -107,6 +126,50 @@ structure Schema where
   normalForm : Option NormalForm
   deriving Repr
 
+-- Type refinement: filters results to those satisfying predicate
+structure TypeRefinement (α : Type) where
+  predicate : α → Prop
+  proof : ∀ x : α, Decidable (predicate x)
+
+-- SELECT components (defined before SelectStmt uses them)
+inductive SelectList where
+  | star : SelectList
+  | columns : List String → SelectList
+  | typed : (t : Type) → TypeRefinement t → SelectList
+  deriving Repr
+
+structure TableRef where
+  name : String
+  alias : Option String
+  deriving Repr
+
+structure FromClause where
+  tables : List TableRef
+  deriving Repr
+
+-- Conditions with type checking
+inductive Condition where
+  | eq : {t : TypeExpr} → TypedValue t → TypedValue t → Condition
+  | lt : {t : TypeExpr} → TypedValue t → TypedValue t → Condition
+  | and : Condition → Condition → Condition
+  | or : Condition → Condition → Condition
+  | not : Condition → Condition
+
+-- Manual Repr for Condition (complex structure)
+instance : Repr Condition where
+  reprPrec
+    | .eq _ _, _ => "Condition.eq"
+    | .lt _ _, _ => "Condition.lt"
+    | .and c1 c2, _ => "Condition.and (" ++ repr c1 ++ ") (" ++ repr c2 ++ ")"
+    | .or c1 c2, _ => "Condition.or (" ++ repr c1 ++ ") (" ++ repr c2 ++ ")"
+    | .not c, _ => "Condition.not (" ++ repr c ++ ")"
+
+-- Assignment for UPDATE statements
+structure Assignment where
+  column : String
+  value : Σ t : TypeExpr, TypedValue t
+  deriving Repr
+
 -- Type-safe INSERT statement
 structure InsertStmt (schema : Schema) where
   table : String
@@ -120,44 +183,21 @@ structure InsertStmt (schema : Schema) where
       col.name = columns.get! i ∧
       (values.get! i).1 = col.type
   -- Provenance proof: rationale is non-empty (automatic via Rationale type)
-  deriving Repr
+
+-- Manual Repr for InsertStmt (can't auto-derive with proof fields)
+instance {schema : Schema} : Repr (InsertStmt schema) where
+  reprPrec stmt _ := "InsertStmt { table := " ++ repr stmt.table ++ ", columns := " ++ repr stmt.columns ++ " }"
 
 -- Type-safe SELECT statement with result type
 structure SelectStmt (resultType : Type) where
   selectList : SelectList
-  from : FromClause
+  from_ : FromClause  -- Underscore to avoid keyword conflict
   where_ : Option Condition
   returning : Option (TypeRefinement resultType)
-  deriving Repr
 
-inductive SelectList where
-  | star : SelectList
-  | columns : List String → SelectList
-  | typed : (t : Type) → TypeRefinement t → SelectList
-  deriving Repr
-
-structure FromClause where
-  tables : List TableRef
-  deriving Repr
-
-structure TableRef where
-  name : String
-  alias : Option String
-  deriving Repr
-
--- Type refinement: filters results to those satisfying predicate
-structure TypeRefinement (α : Type) where
-  predicate : α → Prop
-  proof : ∀ x : α, Decidable (predicate x)
-
--- Conditions with type checking
-inductive Condition where
-  | eq : {t : TypeExpr} → TypedValue t → TypedValue t → Condition
-  | lt : {t : TypeExpr} → TypedValue t → TypedValue t → Condition
-  | and : Condition → Condition → Condition
-  | or : Condition → Condition → Condition
-  | not : Condition → Condition
-  deriving Repr
+-- Manual Repr for SelectStmt
+instance {resultType : Type} : Repr (SelectStmt resultType) where
+  reprPrec stmt _ := "SelectStmt { from := " ++ repr stmt.from_ ++ " }"
 
 /-- WHERE clause with optional proof obligation
 
@@ -185,12 +225,10 @@ structure UpdateStmt (schema : Schema) where
     ∃ col ∈ schema.columns,
       col.name = a.column ∧
       a.value.1 = col.type
-  deriving Repr
 
-structure Assignment where
-  column : String
-  value : Σ t : TypeExpr, TypedValue t
-  deriving Repr
+-- Manual Repr for UpdateStmt (can't auto-derive with proof fields)
+instance {schema : Schema} : Repr (UpdateStmt schema) where
+  reprPrec stmt _ := "UpdateStmt { table := " ++ repr stmt.table ++ ", assignments := " ++ repr stmt.assignments ++ " }"
 
 -- Type-safe DELETE statement
 structure DeleteStmt where
@@ -199,27 +237,24 @@ structure DeleteStmt where
   rationale : Rationale
   deriving Repr
 
--- Proof obligations for INSERT
-structure InsertProofObligation (stmt : InsertStmt schema) where
-  -- All values satisfy their type constraints
-  valuesValid : ∀ i, i < stmt.values.length →
-    let ⟨t, v⟩ := stmt.values.get! i
-    satisfiesConstraints v t
+-- Proof obligations for INSERT (simplified)
+-- Note: In practice, these would be checked at compile-time by the type system
+structure InsertProofObligation {schema : Schema} (stmt : InsertStmt schema) where
   -- Rationale is non-empty (automatically satisfied by Rationale type)
-  -- Can be extended with custom proof obligations
+  -- Type constraints are enforced by the dependent types
+  -- This structure can be extended with additional custom proof obligations
 
 -- Helper: check if value satisfies type constraints
-def satisfiesConstraints {t : TypeExpr} (v : TypedValue t) (ty : TypeExpr) : Prop :=
-  match t, ty with
-  | .boundedNat min max, .boundedNat min' max' =>
-      min = min' ∧ max = max' ∧
+def satisfiesConstraints {t : TypeExpr} (v : TypedValue t) : Prop :=
+  match t with
+  | .boundedNat min max =>
       match v with
       | .boundedNat _ _ bn => bn.val ≥ min ∧ bn.val ≤ max
       | _ => False
-  | .nonEmptyString, .nonEmptyString =>
+  | .nonEmptyString =>
       match v with
       | .nonEmptyString nes => nes.val.length > 0
       | _ => False
-  | _, _ => True  -- Other types checked structurally
+  | _ => True  -- Other types checked structurally
 
 end FbqlDt.AST

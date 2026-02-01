@@ -1,8 +1,7 @@
 # FQLdt: Dependently-Typed FormDB Query Language
 
-image:[License,link="https://github.com/hyperpolymath/palimpsest-license"]
-
-// SPDX-License-Identifier: PMPL-1.0
+image:https://img.shields.io/badge/License-PMPL--1.0-blue.svg[License: PMPL-1.0,link="https://github.com/hyperpolymath/palimpsest-license"]
+// SPDX-License-Identifier: PMPL-1.0-or-later
 // SPDX-FileCopyrightText: 2025 hyperpolymath
 
 FQLdt extends [FormDB](https://github.com/hyperpolymath/formdb)'s query language with **dependent types**, enabling compile-time verification of database constraints, provenance tracking, and reversibility proofs.

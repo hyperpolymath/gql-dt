@@ -99,6 +99,15 @@ inductive NormalForm where
   | nf4 : NormalForm
   deriving Repr
 
+-- ToString for NormalForm
+instance : ToString NormalForm where
+  toString
+    | .nf1 => "1NF"
+    | .nf2 => "2NF"
+    | .nf3 => "3NF"
+    | .bcnf => "BCNF"
+    | .nf4 => "4NF"
+
 -- Type-safe values indexed by their types
 -- DEPENDS ON: TypeExpr
 inductive TypedValue : TypeExpr → Type where

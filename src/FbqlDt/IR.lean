@@ -8,6 +8,7 @@ import FbqlDt.AST
 import FbqlDt.TypeSafe
 import FbqlDt.Types
 import FbqlDt.Serialization.Types
+import FbqlDt.Serialization
 import FbqlDt.Provenance
 
 namespace FbqlDt.IR
@@ -68,6 +69,14 @@ inductive ValidationLevel where
   | paranoid : ValidationLevel   -- Manual proofs required
   deriving Repr, BEq
 
+-- ToString for ValidationLevel
+instance : ToString ValidationLevel where
+  toString
+    | .none => "none"
+    | .runtime => "runtime"
+    | .compile => "compile"
+    | .paranoid => "paranoid"
+
 /-- Permission metadata attached to every IR statement -/
 structure PermissionMetadata where
   userId : String
@@ -99,7 +108,7 @@ structure IR.Insert (schema : Schema) where
 /-- SELECT IR: Typed select with optional refinement -/
 structure IR.Select (α : Type) where
   selectList : SelectList
-  from : FromClause
+  from_ : FromClause
   where_ : Option WhereClause
   orderBy : Option OrderByClause
   limit : Option Nat
@@ -125,6 +134,13 @@ structure IR.Delete (schema : Schema) where
   permissions : PermissionMetadata
   deriving Repr
 
+/-- Decomposition strategy for normalization -/
+inductive DecompositionStrategy where
+  | bcnf : DecompositionStrategy
+  | threeNF : DecompositionStrategy
+  | fourNF : DecompositionStrategy
+  deriving Repr, BEq
+
 /-- NORMALIZE IR: Schema normalization operation -/
 structure IR.Normalize (schema : Schema) where
   targetForm : NormalForm
@@ -140,7 +156,7 @@ structure IR.Normalize (schema : Schema) where
 /-- The IR represents any FBQLdt/FBQL statement -/
 inductive IR where
   | insert : {schema : Schema} → IR.Insert schema → IR
-  | select : {α : Type} → IR.Select α → IR
+  | select : IR.Select Unit → IR  -- Simplified to use Unit instead of polymorphic type
   | update : {schema : Schema} → IR.Update schema → IR
   | delete : {schema : Schema} → IR.Delete schema → IR
   | normalize : {schema : Schema} → IR.Normalize schema → IR
@@ -159,15 +175,16 @@ def serializeProof (proofType : String) (proofData : String) : ProofBlob :=
   let cbor := CBORValue.map [
     (.textString "type", .textString proofType),
     (.textString "data", .textString proofData),
-    (.textString "verified", .bool true)  -- Proof checked at compile-time
+    (.textString "verified", .simple 21)  -- CBOR simple value 21 = true
   ]
   {
-    cborData := encodeCBOR cbor,
+    cborData := Serialization.encodeCBOR cbor,
     proofType := proofType
   }
 
 /-- Generate IR from typed AST (FBQLdt path) -/
 def generateIR_Insert
+  {schema : Schema}
   (stmt : InsertStmt schema)
   (permissions : PermissionMetadata)
   : IR :=
@@ -202,11 +219,11 @@ def generateIR_Select
   : IR :=
   .select {
     selectList := stmt.selectList,
-    from := stmt.from,
-    where_ := stmt.where_,
+    from_ := stmt.from_,
+    where_ := none,  -- TODO: Convert Condition to WhereClause
     orderBy := none,  -- TODO: Parse ORDER BY
     limit := none,     -- TODO: Parse LIMIT
-    returning := stmt.returning,
+    returning := none,  -- TODO: Convert TypeRefinement
     permissions := permissions
   }
 
@@ -214,21 +231,8 @@ def generateIR_Select
 -- CBOR Serialization
 -- ============================================================================
 
-/-- Serialize IR to CBOR bytes for network transport
-
-    CBOR encoding preserves:
-    - Type information (TypeExpr tags)
-    - Proof blobs
-    - Permission metadata
-    - All structural information
--/
-def serializeIR (ir : IR) : ByteArray :=
-  match ir with
-  | .insert stmt => serializeInsert stmt
-  | .select stmt => serializeSelect stmt
-  | .update stmt => serializeUpdate stmt
-  | .delete stmt => serializeDelete stmt
-  | .normalize stmt => serializeNormalize stmt
+/-- Serialize typed value to CBOR (stub) -/
+private axiom serializeTypedValueCBOR : (Σ t : TypeExpr, TypedValue t) → CBORValue
 
 /-- Serialize PermissionMetadata to CBOR -/
 private def serializePermissions (perms : PermissionMetadata) : CBORValue :=
@@ -240,27 +244,27 @@ private def serializePermissions (perms : PermissionMetadata) : CBORValue :=
   ]
 
 /-- Serialize INSERT to CBOR -/
-private def serializeInsert {schema : Schema} (stmt : IR.Insert schema) : ByteArray :=
+private noncomputable def serializeInsert {schema : Schema} (stmt : IR.Insert schema) : ByteArray :=
   let values := stmt.values.map (fun tv => serializeTypedValueCBOR tv)
   let cbor := CBORValue.map [
     (.textString "type", .textString "insert"),
     (.textString "table", .textString stmt.table),
     (.textString "columns", .array (stmt.columns.map .textString)),
     (.textString "values", .array values),
-    (.textString "rationale", .textString stmt.rationale.val),
+    (.textString "rationale", .textString stmt.rationale.text.val),
     (.textString "proofs", .array (stmt.proofs.map fun p => .byteString p.cborData)),
     (.textString "permissions", serializePermissions stmt.permissions)
   ]
-  encodeCBOR cbor
+  Serialization.encodeCBOR cbor
 
 /-- Serialize SELECT to CBOR -/
-private def serializeSelect {α : Type} (stmt : IR.Select α) : ByteArray :=
+private def serializeSelect (stmt : IR.Select Unit) : ByteArray :=
   let selectListCBOR := match stmt.selectList with
     | .star => CBORValue.textString "*"
     | .columns cols => .array (cols.map .textString)
     | .typed _ _ => .textString "*"  -- TODO: Serialize type refinement
 
-  let tablesCBOR := .array (stmt.from.tables.map fun t =>
+  let tablesCBOR := .array (stmt.from_.tables.map fun t =>
     .map [
       (.textString "name", .textString t.name),
       (.textString "alias", match t.alias with
@@ -274,10 +278,10 @@ private def serializeSelect {α : Type} (stmt : IR.Select α) : ByteArray :=
     (.textString "tables", tablesCBOR),
     (.textString "permissions", serializePermissions stmt.permissions)
   ]
-  encodeCBOR cbor
+  Serialization.encodeCBOR cbor
 
 /-- Serialize UPDATE to CBOR -/
-private def serializeUpdate {schema : Schema} (stmt : IR.Update schema) : ByteArray :=
+private noncomputable def serializeUpdate {schema : Schema} (stmt : IR.Update schema) : ByteArray :=
   let assignmentsCBOR := .array (stmt.assignments.map fun a =>
     .map [
       (.textString "column", .textString a.column),
@@ -288,21 +292,21 @@ private def serializeUpdate {schema : Schema} (stmt : IR.Update schema) : ByteAr
     (.textString "type", .textString "update"),
     (.textString "table", .textString stmt.table),
     (.textString "assignments", assignmentsCBOR),
-    (.textString "rationale", .textString stmt.rationale.val),
+    (.textString "rationale", .textString stmt.rationale.text.val),
     (.textString "proofs", .array (stmt.proofs.map fun p => .byteString p.cborData)),
     (.textString "permissions", serializePermissions stmt.permissions)
   ]
-  encodeCBOR cbor
+  Serialization.encodeCBOR cbor
 
 /-- Serialize DELETE to CBOR -/
 private def serializeDelete {schema : Schema} (stmt : IR.Delete schema) : ByteArray :=
   let cbor := CBORValue.map [
     (.textString "type", .textString "delete"),
     (.textString "table", .textString stmt.table),
-    (.textString "rationale", .textString stmt.rationale.val),
+    (.textString "rationale", .textString stmt.rationale.text.val),
     (.textString "permissions", serializePermissions stmt.permissions)
   ]
-  encodeCBOR cbor
+  Serialization.encodeCBOR cbor
 
 /-- Serialize NORMALIZE to CBOR -/
 private def serializeNormalize {schema : Schema} (stmt : IR.Normalize schema) : ByteArray :=
@@ -312,37 +316,20 @@ private def serializeNormalize {schema : Schema} (stmt : IR.Normalize schema) : 
     (.textString "proofs", .array (stmt.proofs.map fun p => .byteString p.cborData)),
     (.textString "permissions", serializePermissions stmt.permissions)
   ]
-  encodeCBOR cbor
+  Serialization.encodeCBOR cbor
 
-/-- Deserialize CBOR bytes to IR -/
-def deserializeIR (bytes : ByteArray) : Except String IR := do
-  let cbor ← decodeCBOR bytes
+/-- Serialize IR to CBOR bytes for network transport -/
+noncomputable def serializeIR (ir : IR) : ByteArray :=
+  match ir with
+  | .insert stmt => serializeInsert stmt
+  | .select stmt => serializeSelect stmt
+  | .update stmt => serializeUpdate stmt
+  | .delete stmt => serializeDelete stmt
+  | .normalize stmt => serializeNormalize stmt
 
-  match cbor with
-  | .map fields =>
-      -- Extract type tag
-      let type? := fields.find? fun (k, _) => k == .textString "type"
-      match type? with
-      | some (_, .textString "insert") =>
-          -- TODO: Reconstruct IR.Insert with schema
-          .error "INSERT deserialization not yet implemented"
-
-      | some (_, .textString "select") =>
-          -- TODO: Reconstruct IR.Select
-          .error "SELECT deserialization not yet implemented"
-
-      | some (_, .textString "update") =>
-          .error "UPDATE deserialization not yet implemented"
-
-      | some (_, .textString "delete") =>
-          .error "DELETE deserialization not yet implemented"
-
-      | some (_, .textString "normalize") =>
-          .error "NORMALIZE deserialization not yet implemented"
-
-      | _ => .error "Unknown IR type tag"
-
-  | _ => .error "Expected CBOR map for IR"
+/-- Deserialize CBOR bytes to IR (stub) -/
+-- TODO: Implement full CBOR deserialization with schema reconstruction
+axiom deserializeIR (bytes : ByteArray) : Except String IR
 
 -- ============================================================================
 -- Permission Validation
@@ -357,22 +344,22 @@ def isTypeAllowed (t : TypeExpr) (allowedTypes : List TypeExpr) : Bool :=
     allowedTypes.contains t
 
 /-- Validate IR against permission metadata -/
-def validatePermissions (ir : IR) : Except String Unit :=
+def validatePermissions (ir : IR) : Except String Unit := do
   match ir with
   | .insert stmt =>
       -- Check all value types are allowed
       for ⟨t, _⟩ in stmt.values do
         if !isTypeAllowed t stmt.permissions.allowedTypes then
-          return .error s!"Type {t} not allowed by permission profile"
-      .ok ()
-  | .select stmt => .ok ()  -- SELECT doesn't modify data
+          throw s!"Type {t} not allowed by permission profile"
+      return ()
+  | .select stmt => return ()  -- SELECT doesn't modify data
   | .update stmt =>
       for assign in stmt.assignments do
         if !isTypeAllowed assign.value.1 stmt.permissions.allowedTypes then
-          return .error s!"Type {assign.value.1} not allowed by permission profile"
-      .ok ()
-  | .delete stmt => .ok ()  -- DELETE doesn't use typed values
-  | .normalize stmt => .ok ()  -- NORMALIZE is admin-only
+          throw s!"Type {assign.value.1} not allowed by permission profile"
+      return ()
+  | .delete stmt => return ()  -- DELETE doesn't use typed values
+  | .normalize stmt => return ()  -- NORMALIZE is admin-only
 
 -- ============================================================================
 -- IR Optimization
@@ -386,6 +373,20 @@ def validatePermissions (ir : IR) : Except String Unit :=
     - Proof caching (if already verified)
     - Query plan hints
 -/
+
+-- Helper functions defined first
+private def optimizeInsert {schema : Schema} (stmt : IR.Insert schema) : IR.Insert schema :=
+  -- TODO: Constant folding, proof caching
+  stmt
+
+private def optimizeSelect (stmt : IR.Select Unit) : IR.Select Unit :=
+  -- TODO: Query plan optimization
+  stmt
+
+private def optimizeUpdate {schema : Schema} (stmt : IR.Update schema) : IR.Update schema :=
+  -- TODO: Minimize assignments
+  stmt
+
 def optimizeIR (ir : IR) : IR :=
   match ir with
   | .insert stmt => .insert (optimizeInsert stmt)
@@ -393,18 +394,6 @@ def optimizeIR (ir : IR) : IR :=
   | .update stmt => .update (optimizeUpdate stmt)
   | .delete stmt => .delete stmt  -- No optimization for DELETE
   | .normalize stmt => .normalize stmt  -- No optimization for NORMALIZE
-
-private def optimizeInsert {schema : Schema} (stmt : IR.Insert schema) : IR.Insert schema :=
-  -- TODO: Constant folding, proof caching
-  stmt
-
-private def optimizeSelect {α : Type} (stmt : IR.Select α) : IR.Select α :=
-  -- TODO: Query plan optimization
-  stmt
-
-private def optimizeUpdate {schema : Schema} (stmt : IR.Update schema) : IR.Update schema :=
-  -- TODO: Minimize assignments
-  stmt
 
 -- ============================================================================
 -- IR → SQL Lowering (Compatibility Layer)
@@ -424,13 +413,13 @@ private def optimizeUpdate {schema : Schema} (stmt : IR.Update schema) : IR.Upda
 
     PRIMARY execution path is native FormDB (preserves types).
 -/
-def lowerToSQL (ir : IR) : String :=
-  match ir with
-  | .insert stmt => lowerInsertToSQL stmt
-  | .select stmt => lowerSelectToSQL stmt
-  | .update stmt => lowerUpdateToSQL stmt
-  | .delete stmt => lowerDeleteToSQL stmt
-  | .normalize _ => "-- NORMALIZE not supported in SQL"
+-- Helper function must be defined first
+private def valueToSQL {t : TypeExpr} (v : TypedValue t) : String :=
+  match v with
+  | .nat n => toString n
+  | .boundedNat _ _ bn => toString bn.val  -- BOUNDS LOST!
+  | .nonEmptyString nes => s!"'{nes.val}'"  -- NON-EMPTY GUARANTEE LOST!
+  | _ => "NULL"  -- TODO: Handle all types
 
 private def lowerInsertToSQL {schema : Schema} (stmt : IR.Insert schema) : String :=
   let columnList := String.intercalate ", " stmt.columns
@@ -438,20 +427,12 @@ private def lowerInsertToSQL {schema : Schema} (stmt : IR.Insert schema) : Strin
   let values := String.intercalate ", " valueList
   s!"INSERT INTO {stmt.table} ({columnList}) VALUES ({values});"
 
-private def valueToSQL (v : TypedValue t) : String :=
-  match v with
-  | .nat n => toString n
-  | .boundedNat _ _ bn => toString bn.val  -- BOUNDS LOST!
-  | .nonEmptyString nes => s!"'{nes.val}'"  -- NON-EMPTY GUARANTEE LOST!
-  | .confidence c => toString c.val  -- TYPE LOST!
-  | _ => "NULL"  -- TODO: Handle all types
-
-private def lowerSelectToSQL {α : Type} (stmt : IR.Select α) : String :=
+private def lowerSelectToSQL (stmt : IR.Select Unit) : String :=
   let cols := match stmt.selectList with
     | .star => "*"
     | .columns cs => String.intercalate ", " cs
     | .typed _ _ => "*"  -- TYPE REFINEMENT LOST!
-  let tables := String.intercalate ", " (stmt.from.tables.map (·.name))
+  let tables := String.intercalate ", " (stmt.from_.tables.map (·.name))
   s!"SELECT {cols} FROM {tables};"
 
 private def lowerUpdateToSQL {schema : Schema} (stmt : IR.Update schema) : String :=
@@ -467,6 +448,23 @@ private def lowerDeleteToSQL {schema : Schema} (stmt : IR.Delete schema) : Strin
   -- WHERE clause is mandatory for DELETE (safety)
   s!"DELETE FROM {stmt.table} WHERE <condition>;"  -- TODO: WHERE expression
 
+/-- Lower IR to SQL (lossy - types erased!)
+
+    WARNING: This is for COMPATIBILITY ONLY.
+    - All dependent types are erased
+    - Proofs are discarded
+    - Type safety moves from compile-time to runtime
+
+    PRIMARY execution path is native FormDB (preserves types).
+-/
+def lowerToSQL (ir : IR) : String :=
+  match ir with
+  | .insert stmt => lowerInsertToSQL stmt
+  | .select stmt => lowerSelectToSQL stmt
+  | .update stmt => lowerUpdateToSQL stmt
+  | .delete stmt => lowerDeleteToSQL stmt
+  | .normalize _ => "-- NORMALIZE not supported in SQL"
+
 -- ============================================================================
 -- IR Inspection & Debugging
 -- ============================================================================
@@ -475,7 +473,7 @@ private def lowerDeleteToSQL {schema : Schema} (stmt : IR.Delete schema) : Strin
 def describeIR (ir : IR) : String :=
   match ir with
   | .insert stmt => s!"INSERT into {stmt.table} ({stmt.columns.length} columns)"
-  | .select stmt => s!"SELECT from {stmt.from.tables.length} tables"
+  | .select stmt => s!"SELECT from {stmt.from_.tables.length} tables"
   | .update stmt => s!"UPDATE {stmt.table} ({stmt.assignments.length} assignments)"
   | .delete stmt => s!"DELETE from {stmt.table}"
   | .normalize stmt => s!"NORMALIZE to {stmt.targetForm}"
@@ -504,7 +502,6 @@ def requiresProofs (ir : IR) : Bool :=
 /-- Example: Create IR for INSERT -/
 -- Simplified to use axioms to avoid complex PromptScores proof obligations
 axiom exampleInsertIR : IR
-    permissions
 
 #check exampleInsertIR  -- IR (type-safe!)
 

@@ -68,7 +68,7 @@ inductive TypeExpr where
   | vector : TypeExpr → Nat → TypeExpr
   | promptScores : TypeExpr
   -- Note: Provenance tracking via TrackedValue wrapper, not a type constructor
-  deriving Repr, BEq
+  deriving Repr
 
 -- ToString instance for TypeExpr
 def typeExprToString : TypeExpr → String
@@ -88,6 +88,27 @@ def typeExprToString : TypeExpr → String
 
 instance : ToString TypeExpr where
   toString := typeExprToString
+
+-- DecidableEq instance for TypeExpr
+-- Note: Floats use bitwise equality (Float.beq) which may not match mathematical equality
+def typeExprBeq : TypeExpr → TypeExpr → Bool
+  | .nat, .nat => true
+  | .int, .int => true
+  | .string, .string => true
+  | .bool, .bool => true
+  | .float, .float => true
+  | .uuid, .uuid => true
+  | .timestamp, .timestamp => true
+  | .boundedNat min1 max1, .boundedNat min2 max2 => min1 == min2 && max1 == max2
+  | .boundedFloat min1 max1, .boundedFloat min2 max2 => min1.beq min2 && max1.beq max2
+  | .nonEmptyString, .nonEmptyString => true
+  | .confidence, .confidence => true
+  | .vector t1 n1, .vector t2 n2 => typeExprBeq t1 t2 && n1 == n2
+  | .promptScores, .promptScores => true
+  | _, _ => false
+
+instance : BEq TypeExpr where
+  beq := typeExprBeq
 
 -- Normal form levels
 -- NO DEPENDENCIES

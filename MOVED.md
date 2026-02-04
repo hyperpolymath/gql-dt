@@ -1,0 +1,58 @@
+# This Repository Has Moved
+
+**FBQLdt is now part of the [FormDB monorepo](https://github.com/hyperpolymath/formdb).**
+
+## New Location
+
+- **Monorepo:** https://github.com/hyperpolymath/formdb
+- **Query Language:** https://github.com/hyperpolymath/formdb/tree/main/query
+
+## Why the Move?
+
+FBQLdt (FormDB Query Language with dependent types) is the query interface for FormDB. To improve discoverability and maintenance, we've consolidated the FormDB ecosystem into a single monorepo:
+
+```
+formdb/
+├── query/          # FBQLdt (this repo)
+├── database/       # Form.Model + Form.Blocks (Forth core)
+├── bridge/         # Zig FFI bridge
+├── studio/         # Web-based GUI
+└── debugger/       # Proof-carrying debugger
+```
+
+## Benefits of the Monorepo
+
+- **Single source of truth** for all FormDB components
+- **Coordinated versioning** across query language, database, and tools
+- **Unified documentation** and examples
+- **Shared CI/CD** and dependency management
+- **Easier cross-component refactoring**
+
+## Migration Guide
+
+### For Users
+
+Update your imports/dependencies:
+
+**Before:**
+```bash
+git clone https://github.com/hyperpolymath/fbql-dt
+```
+
+**After:**
+```bash
+git clone https://github.com/hyperpolymath/formdb
+cd formdb/query
+```
+
+### For Contributors
+
+Submit PRs to the [formdb monorepo](https://github.com/hyperpolymath/formdb) instead.
+
+## This Repository's Future
+
+This repository (`fbql-dt`) will be archived and remain as a historical reference. All active development happens in the monorepo.
+
+---
+
+**See you at [github.com/hyperpolymath/formdb](https://github.com/hyperpolymath/formdb)!** 🚀

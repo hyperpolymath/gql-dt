@@ -71,7 +71,7 @@ def score95 : BoundedNat 0 100 := ⟨95, by omega, by omega⟩
 
 **Architecture:**
 ```
-FQL Source
+GQL Source
     ↓
 Lean 4 Parser (Parsec combinators)
     ↓
@@ -81,7 +81,7 @@ Type Checker (with proof search)
     ↓
 Type-checked IR + Proofs
     ↓
-Code Generator → Standard FQL (for FormDB runtime)
+Code Generator → Standard GQL (for Lithoglyph runtime)
 ```
 
 **Pros:**
@@ -149,7 +149,7 @@ def parseProofClause : Parsec ProofClause := do
 
 **Architecture:**
 ```
-FQL Source
+GQL Source
     ↓
 ANTLR Parser (Java/Python/C++)
     ↓
@@ -175,7 +175,7 @@ Type-checked IR + Proofs
 
 **When to use:**
 - Tooling that doesn't need type checking (syntax highlighters, formatters)
-- Migration path (parse FQL with ANTLR, upgrade to Lean 4 later)
+- Migration path (parse GQL with ANTLR, upgrade to Lean 4 later)
 
 ---
 
@@ -183,7 +183,7 @@ Type-checked IR + Proofs
 
 **Architecture:**
 ```
-FQL Source
+GQL Source
     ↓
 Tree-sitter Parser (C)
     ↓
@@ -214,7 +214,7 @@ Lean 4 Type Checker (via C FFI)
 
 **Architecture:**
 ```
-FQL Source
+GQL Source
     ↓
 Idris 2 Parser (Lightyear combinators)
     ↓
@@ -313,15 +313,15 @@ Type-checked IR + Proofs
                             ↓
 ┌─────────────────────────────────────────────────────────────┐
 │  Type Checker (Lean 4-based)                                 │
-│  - Parse FQL with Lean 4 Parsec                              │
+│  - Parse GQL with Lean 4 Parsec                              │
 │  - Type check with proof obligations                         │
 │  - Generate proofs with tactics                              │
 │  → Slow, but correct                                         │
 └─────────────────────────────────────────────────────────────┘
                             ↓
 ┌─────────────────────────────────────────────────────────────┐
-│  Runtime (FormDB)                                            │
-│  - Execute type-erased FQL                                   │
+│  Runtime (Lithoglyph)                                            │
+│  - Execute type-erased GQL                                   │
 │  - Proofs stored in journal (optional verification)          │
 │  → Fast, proofs already verified                             │
 └─────────────────────────────────────────────────────────────┘
@@ -331,28 +331,28 @@ Type-checked IR + Proofs
 
 **Development (Lean 4):**
 ```bash
-# Developer writes FQL with types
+# Developer writes GQL with types
 vim query.fql.lean
 
 # Type check with Lean 4 (includes proof search)
 lean4 --check query.fql.lean
 # ✓ All proofs valid
 
-# Generate runtime FQL (proofs erased)
+# Generate runtime GQL (proofs erased)
 lean4 --codegen fql query.fql.lean > query.fql
 
-# Execute on FormDB
+# Execute on Lithoglyph
 formdb execute query.fql
 ```
 
 **Production (optional):**
 ```bash
 # Quick syntax check with ANTLR (fast, no proofs)
-fbqldt-lint query.fql
+gqldt-lint query.fql
 # ✓ Syntax OK (proofs not checked)
 
 # Full verification with Lean 4 (slow, complete)
-fbqldt-verify query.fql
+gqldt-verify query.fql
 # ✓ Type-checked, proofs valid
 ```
 
@@ -410,7 +410,7 @@ import FbqlDt.AST
 namespace FbqlDt.Parser
 
 -- Use Lean 4 Parsec combinators
-def parseFQL : String → Except String TypedAST := ...
+def parseGQL : String → Except String TypedAST := ...
 ```
 
 **Deliverables:**

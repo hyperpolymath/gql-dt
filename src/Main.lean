@@ -1,9 +1,9 @@
 -- SPDX-License-Identifier: PMPL-1.0
 -- SPDX-FileCopyrightText: 2025 hyperpolymath
 --
--- Main.lean - FQLdt CLI/REPL
+-- Main.lean - GQLdt CLI/REPL
 --
--- Interactive query interface for the FormDB Query Language.
+-- Interactive query interface for the Lithoglyph Query Language.
 -- Demonstrates dependently-typed queries with provenance tracking.
 
 import FbqlDt.Query
@@ -98,7 +98,7 @@ def parseCommand (input : String) : ReplCommand :=
 
 /-- Print help message -/
 def printHelp : IO Unit := do
-  IO.println "FQLdt - Dependently-Typed FormDB Query Language"
+  IO.println "GQLdt - Dependently-Typed Lithoglyph Query Language"
   IO.println ""
   IO.println "Commands:"
   IO.println "  .help, ?          Show this help message"
@@ -253,7 +253,7 @@ partial def replLoop (db : Database) (store : DatabaseStore) : IO Unit := do
 
 def main (args : List String) : IO Unit := do
   IO.println "╔════════════════════════════════════════════════════════════════╗"
-  IO.println "║  FQLdt - Dependently-Typed FormDB Query Language  v1.0.0       ║"
+  IO.println "║  GQLdt - Dependently-Typed Lithoglyph Query Language  v1.0.0       ║"
   IO.println "║  Type .help for commands, .quit to exit                        ║"
   IO.println "╚════════════════════════════════════════════════════════════════╝"
   IO.println ""

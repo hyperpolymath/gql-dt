@@ -1,4 +1,4 @@
-# White Paper 06: Dependently-Typed FormDB
+# White Paper 06: Dependently-Typed Lithoglyph
 
 **Status**: Research Proposal  
 **Version**: 0.1.0  
@@ -8,7 +8,7 @@
 
 ## Abstract
 
-FormDB's narrative-first architecture demands stronger correctness guarantees than traditional databases can provide. We propose extending FormDB with dependent types—types that depend on values—enabling compile-time verification of epistemic properties. This transforms FormDB from a database that *records* provenance to one that *proves* provenance. We demonstrate how dependent types naturally express PROMPT score constraints, provenance tracking, reversibility proofs, and belief fusion in the My-Newsroom multi-agent system. Our approach is incremental: refinement types first (simple, high ROI), then full dependent types (research frontier). This positions FormDB as the first database with **provable epistemology**, uniquely suited for journalism, scientific reproducibility, and AI agent collaboration where correctness is non-negotiable.
+Lithoglyph's narrative-first architecture demands stronger correctness guarantees than traditional databases can provide. We propose extending Lithoglyph with dependent types—types that depend on values—enabling compile-time verification of epistemic properties. This transforms Lithoglyph from a database that *records* provenance to one that *proves* provenance. We demonstrate how dependent types naturally express PROMPT score constraints, provenance tracking, reversibility proofs, and belief fusion in the My-Newsroom multi-agent system. Our approach is incremental: refinement types first (simple, high ROI), then full dependent types (research frontier). This positions Lithoglyph as the first database with **provable epistemology**, uniquely suited for journalism, scientific reproducibility, and AI agent collaboration where correctness is non-negotiable.
 
 ## 1. Introduction
 
@@ -55,9 +55,9 @@ badScore = MkPromptScore 150  -- TYPE ERROR: Can't prove LTE 150 100
 3. **Machine-checkable proofs**: Types ARE proofs (Curry-Howard correspondence)
 4. **Agent-friendly**: LLM agents can check types before generating code
 
-### 1.3 Why FormDB Needs This
+### 1.3 Why Lithoglyph Needs This
 
-FormDB has **unique epistemic requirements**:
+Lithoglyph has **unique epistemic requirements**:
 
 | Requirement | Current (Runtime) | With Dependent Types |
 |-------------|-------------------|---------------------|
@@ -68,7 +68,7 @@ FormDB has **unique epistemic requirements**:
 | Confidence levels valid | Runtime CHECK | Type-level bounds |
 | Navigation paths ordered | Runtime sort | Type proves ordering |
 
-**Thesis**: Dependent types transform FormDB from a database that *records* epistemology to one that *proves* epistemology.
+**Thesis**: Dependent types transform Lithoglyph from a database that *records* epistemology to one that *proves* epistemology.
 
 ## 2. Background: Dependent Types
 
@@ -153,9 +153,9 @@ plusZeroRightNeutral (S k) =       -- Proof for successor
   rewrite plusZeroRightNeutral k in Refl
 ```
 
-**For FormDB**: Type-checking = Proof-checking. If it compiles, the proof is valid!
+**For Lithoglyph**: Type-checking = Proof-checking. If it compiles, the proof is valid!
 
-## 3. Motivation: FormDB's Epistemic Requirements
+## 3. Motivation: Lithoglyph's Epistemic Requirements
 
 ### 3.1 PROMPT Score Invariants
 
@@ -255,7 +255,7 @@ insertClaim : (text : String) ->
 ```fql
 -- Claim operation is reversible
 INSERT INTO claims (text) VALUES ('X') RATIONALE "...";
--- FormDB generates inverse: DELETE FROM claims WHERE id = 'uuid'
+-- Lithoglyph generates inverse: DELETE FROM claims WHERE id = 'uuid'
 -- Tests at runtime that inverse works
 ```
 
@@ -553,19 +553,19 @@ data JournalEntry : Type where
             JournalEntry
 ```
 
-### 4.3 FQL Syntax Extensions
+### 4.3 GQL Syntax Extensions
 
 #### **4.3.1 Type Annotations**
 
 ```fql
--- Current FQL
+-- Current GQL
 CREATE COLLECTION evidence (
   prompt_scores STRUCT {
     provenance INT CHECK (provenance BETWEEN 0 AND 100)
   }
 );
 
--- Extended FQL with dependent types
+-- Extended GQL with dependent types
 CREATE COLLECTION evidence (
   id : UUID,
   title : NonEmptyString,
@@ -626,7 +626,7 @@ WITH_PROOF {
 
 ```
 ┌──────────────────────────────────────────────────┐
-│  FQL Source Code (with dependent type syntax)   │
+│  GQL Source Code (with dependent type syntax)   │
 └────────────────┬─────────────────────────────────┘
                  │
                  ▼
@@ -642,13 +642,13 @@ WITH_PROOF {
 ┌──────────────────────────────────────────────────┐
 │  Code Generator                                  │
 │  • Erases types (proof-erasure semantics)       │
-│  • Generates FQL for FormDB runtime              │
+│  • Generates GQL for Lithoglyph runtime              │
 │  • Attaches proof objects to journal entries     │
 └────────────────┬─────────────────────────────────┘
                  │
                  ▼
 ┌──────────────────────────────────────────────────┐
-│  FormDB Runtime (Unchanged!)                     │
+│  Lithoglyph Runtime (Unchanged!)                     │
 │  • Forth (Blocks)                                │
 │  • Zig (Bridge)                                  │
 │  • Factor (Runtime)                              │
@@ -658,13 +658,13 @@ WITH_PROOF {
 
 ### 5.2 Phase 1: External Type Checker (Month 1-6)
 
-**Goal**: Opt-in type checking without changing FormDB runtime.
+**Goal**: Opt-in type checking without changing Lithoglyph runtime.
 
 **Implementation**:
-1. **FQL Parser Extension**:
+1. **GQL Parser Extension**:
    ```elixir
    # Parse dependent type annotations
-   defmodule FQL.Parser.DependentTypes do
+   defmodule GQL.Parser.DependentTypes do
      def parse_type_annotation(tokens) do
        # Parse: "x : BoundedNat 0 100"
        # Returns: {:bounded_nat, 0, 100}
@@ -674,15 +674,15 @@ WITH_PROOF {
 
 2. **Type Checker (Idris 2)**:
    ```idris
-   -- FormDB.idr
-   module FormDB.TypeChecker
+   -- Lithoglyph.idr
+   module Lithoglyph.TypeChecker
    
-   import FormDB.Core  -- Core type definitions
+   import Lithoglyph.Core  -- Core type definitions
    
-   -- Check FQL program
+   -- Check GQL program
    checkProgram : String -> Either TypeError (Program, List Proof)
    checkProgram source = do
-     ast <- parseFQL source
+     ast <- parseGQL source
      (typedAST, proofs) <- inferTypes ast
      checkProofs proofs
      pure (typedAST, proofs)
@@ -694,22 +694,22 @@ WITH_PROOF {
    # check_fql.sh
    
    # 1. Type check with Idris
-   idris2 --check FormDB.idr $1
+   idris2 --check Lithoglyph.idr $1
    if [ $? -ne 0 ]; then
      echo "Type checking failed!"
      exit 1
    fi
    
-   # 2. Generate runtime FQL
-   idris2 --codegen fql FormDB.idr $1 > output.fql
+   # 2. Generate runtime GQL
+   idris2 --codegen fql Lithoglyph.idr $1 > output.fql
    
-   # 3. Execute on FormDB
+   # 3. Execute on Lithoglyph
    formdb execute output.fql
    ```
 
 **Usage**:
 ```bash
-# Write FQL with types
+# Write GQL with types
 cat > example.fql.idr
 CREATE COLLECTION evidence (
   id : UUID,
@@ -806,8 +806,8 @@ $ lean4 --server
 ```json
 {
   "name": "formdb-dependent-types",
-  "displayName": "FormDB Dependent Types",
-  "description": "Type checking for FQL with dependent types",
+  "displayName": "Lithoglyph Dependent Types",
+  "description": "Type checking for GQL with dependent types",
   "version": "0.1.0",
   "engines": { "vscode": "^1.80.0" },
   "contributes": {
@@ -825,7 +825,7 @@ $ lean4 --server
 
 **Auto-solving Simple Proofs**:
 ```lean
--- Lean 4 tactics for FormDB
+-- Lean 4 tactics for Lithoglyph
 def formdb_bounds : Tactic :=
   -- Auto-solve bounded integer proofs
   try { norm_num } <|>
@@ -876,7 +876,7 @@ maybe y: Int where uncertainty(0.3)
 
 **Map to Dependent Types**:
 ```idris
--- FormDB dependent types for beliefs
+-- Lithoglyph dependent types for beliefs
 data Belief : (confidence : BoundedFloat 0.0 1.0) -> Type -> Type where
   MkBelief : (value : a) ->
              (confidence : BoundedFloat 0.0 1.0) ->
@@ -995,23 +995,23 @@ verifyAgentClaims claims = do
 
 2. **Provable epistemology**
    - Traditional: "This claim has confidence 0.9" (no proof)
-   - FormDB: "This claim has confidence 0.9 AND here's a proof it's justified"
+   - Lithoglyph: "This claim has confidence 0.9 AND here's a proof it's justified"
    - **Impact**: Trust is verifiable, not just asserted
 
 3. **Type-safe multi-agent systems**
    - Traditional: Agents share unverified beliefs
-   - FormDB: Agents share beliefs + proofs
+   - Lithoglyph: Agents share beliefs + proofs
    - **Impact**: Byzantine resilience via proof verification
 
 4. **Proof-carrying provenance**
    - Traditional: Provenance is metadata (can be forged)
-   - FormDB: Provenance is part of type (can't be forged)
+   - Lithoglyph: Provenance is part of type (can't be forged)
    - **Impact**: Cryptographic-strength audit trails
 
 ### 7.2 Publications
 
 #### **Paper 1: POPL 2027 (Programming Languages)**
-**Title**: "FormDB: A Dependently-Typed Database for Verified Epistemology"
+**Title**: "Lithoglyph: A Dependently-Typed Database for Verified Epistemology"
 - Core type system
 - Proof-erasure semantics
 - Idris/Lean integration
@@ -1042,7 +1042,7 @@ verifyAgentClaims claims = do
 
 | System | Types | Proofs | Provenance | Domain |
 |--------|-------|--------|------------|--------|
-| FormDB (ours) | ✓ Dependent | ✓ Machine-checkable | ✓ Type-level | Journalism/i-docs |
+| Lithoglyph (ours) | ✓ Dependent | ✓ Machine-checkable | ✓ Type-level | Journalism/i-docs |
 | Datomic | Simple | ✗ | ✓ Time-based | General |
 | XTDB | Simple | ✗ | ✓ Bitemporal | General |
 | Prisma | Simple | ✗ | ✗ | General |
@@ -1050,7 +1050,7 @@ verifyAgentClaims claims = do
 | F* | ✓ Dependent | ✓ SMT + Tactics | ✗ | Programming |
 | Agda | ✓ Dependent | ✓ Interactive | ✗ | Mathematics |
 
-**Key Insight**: FormDB combines database + dependent types + provenance = **unique position**.
+**Key Insight**: Lithoglyph combines database + dependent types + provenance = **unique position**.
 
 ## 8. Evaluation
 
@@ -1077,7 +1077,7 @@ verifyAgentClaims claims = do
 ### 8.2 Error Detection
 
 **Compare**:
-- Runtime errors caught with traditional FQL
+- Runtime errors caught with traditional GQL
 - Type errors caught with dependent types
 
 **Hypothesis**: Dependent types catch 80%+ of errors at compile time.
@@ -1094,7 +1094,7 @@ verifyAgentClaims claims = do
 ### 8.3 Developer Experience
 
 **User Study**:
-- 20 developers (10 FormDB users, 10 control)
+- 20 developers (10 Lithoglyph users, 10 control)
 - Task: Implement evidence import from Zotero
 - Measure:
   - Time to completion
@@ -1173,7 +1173,7 @@ verifyAgentClaims claims = do
 
 ```
 ┌──────────────────────────────┐
-│  FQL (Lean 4)                │  ← Application code (verified)
+│  GQL (Lean 4)                │  ← Application code (verified)
 └──────────────┬───────────────┘
                ▼
 ┌──────────────────────────────┐
@@ -1230,7 +1230,7 @@ WITH_PROOF {
 };
 
 Type checker: ✓ All proofs valid
-FormDB: Execute
+Lithoglyph: Execute
 ```
 
 **If LLM hallucinates invalid score**:
@@ -1265,7 +1265,7 @@ contract TransferFunds : Contract where
 
 ## 11. Conclusion
 
-Dependent types transform FormDB from a database that **records** epistemology to one that **proves** epistemology. This enables:
+Dependent types transform Lithoglyph from a database that **records** epistemology to one that **proves** epistemology. This enables:
 
 1. **Compile-time correctness**: Invalid data is a type error, caught immediately
 2. **Provable provenance**: Can't forge provenance (it's in the type)
@@ -1275,7 +1275,7 @@ Dependent types transform FormDB from a database that **records** epistemology t
 
 Our approach is incremental (refinement types → full dependent types → verified stack), making it practical for real-world adoption.
 
-FormDB becomes the **first dependently-typed database**, uniquely positioned for journalism, scientific reproducibility, and AI agent collaboration where **correctness is non-negotiable**.
+Lithoglyph becomes the **first dependently-typed database**, uniquely positioned for journalism, scientific reproducibility, and AI agent collaboration where **correctness is non-negotiable**.
 
 ---
 
@@ -1403,6 +1403,6 @@ instance : Bounded Nat where
 **Document Status**: Research proposal. Implementation timeline: 18-24 months.
 
 **See Also**:
-- FQL Dependent Types Specification (companion document)
-- FormDB arXiv paper (Section 14: Future Work)
+- GQL Dependent Types Specification (companion document)
+- Lithoglyph arXiv paper (Section 14: Future Work)
 - My-Newsroom Me dialect specification

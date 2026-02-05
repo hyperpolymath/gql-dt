@@ -12,7 +12,7 @@ namespace FbqlDt.Prompt
 
 /-- A PROMPT dimension score, bounded 0-100.
 
-This is the fundamental unit for PROMPT scoring in FQLdt.
+This is the fundamental unit for PROMPT scoring in GQLdt.
 Each of the six dimensions uses this type. -/
 abbrev PromptDimension := FbqlDt.Types.BoundedNat 0 100
 

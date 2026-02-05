@@ -45,7 +45,7 @@ Zig FFI (C-compatible bridge)
 **Location:** `bindings/rescript/`
 
 **Use Cases:**
-- FormDB Studio (web UI)
+- Lithoglyph Studio (web UI)
 - Client-side query validation
 - Browser-based type checking
 - Deno backend services
@@ -126,11 +126,11 @@ impl InsertBuilder {
     pub fn build(self) -> Result<InsertStmt, Error> {
         // Validate via Zig FFI
         unsafe {
-            let stmt = fbqldt_sys::fbqldt_insert_create(
+            let stmt = gqldt_sys::gqldt_insert_create(
                 self.table.as_ptr() as *const i8,
                 self.columns.as_ptr() as *const *const i8,
                 self.columns.len(),
-                self.values.as_ptr() as *const fbqldt_sys::FbqlDt_TypedValue,
+                self.values.as_ptr() as *const gqldt_sys::FbqlDt_TypedValue,
                 self.values.len(),
                 self.rationale.as_ptr() as *const i8,
             );
@@ -156,7 +156,7 @@ fn main() -> Result<(), Error> {
         .rationale("Official statistics")
         .build()?;
 
-    // Execute on FormDB
+    // Execute on Lithoglyph
     insert.execute(&database)?;
     Ok(())
 }
@@ -165,9 +165,9 @@ fn main() -> Result<(), Error> {
 **FFI Integration (Rust ↔ Zig):**
 ```rust
 // bindings/rust/src/ffi.rs
-#[link(name = "fbqldt", kind = "static")]
+#[link(name = "gqldt", kind = "static")]
 extern "C" {
-    fn fbqldt_insert_create(
+    fn gqldt_insert_create(
         table: *const i8,
         columns: *const *const i8,
         column_count: usize,
@@ -176,12 +176,12 @@ extern "C" {
         rationale: *const i8,
     ) -> *mut InsertStmt;
 
-    fn fbqldt_insert_execute(
+    fn gqldt_insert_execute(
         stmt: *const InsertStmt,
         db: *mut Database,
     ) -> i32;
 
-    fn fbqldt_insert_free(stmt: *mut InsertStmt);
+    fn gqldt_insert_free(stmt: *mut InsertStmt);
 }
 ```
 
@@ -208,7 +208,7 @@ fn main() {
 
     // Link with Zig library
     println!("cargo:rustc-link-search=../../ffi/zig/zig-out/lib");
-    println!("cargo:rustc-link-lib=static=fbqldt");
+    println!("cargo:rustc-link-lib=static=gqldt");
 
     // Re-run if Zig sources change
     println!("cargo:rerun-if-changed=../../ffi/zig/src");
@@ -218,7 +218,7 @@ fn main() {
 **Cargo.toml:**
 ```toml
 [package]
-name = "fbqldt"
+name = "gqldt"
 version = "0.1.0"
 authors = ["Jonathan D.A. Jewell <jonathan.jewell@open.ac.uk>"]
 edition = "2021"
@@ -266,12 +266,12 @@ module FbqlDt
 
 # Low-level FFI (ccall to Zig)
 module FFI
-    const libfbqldt = "/path/to/libfbqldt.so"
+    const libgqldt = "/path/to/libgqldt.so"
 
     function insert_create(table::String, columns::Vector{String},
                            values::Vector{TypedValue}, rationale::String)
         ccall(
-            (:fbqldt_insert_create, libfbqldt),
+            (:gqldt_insert_create, libgqldt),
             Ptr{Cvoid},
             (Cstring, Ptr{Cstring}, Csize_t, Ptr{Cvoid}, Csize_t, Cstring),
             table, columns, length(columns), values, length(values), rationale
@@ -280,7 +280,7 @@ module FFI
 
     function insert_execute(stmt::Ptr{Cvoid}, db::Ptr{Cvoid})
         ccall(
-            (:fbqldt_insert_execute, libfbqldt),
+            (:gqldt_insert_execute, libgqldt),
             Cint,
             (Ptr{Cvoid}, Ptr{Cvoid}),
             stmt, db
@@ -391,19 +391,19 @@ julia = "1.9"
 bindings/gleam/
 ├── gleam.toml
 ├── src/
-│   ├── fbqldt.gleam           # Main module
-│   ├── fbqldt/
+│   ├── gqldt.gleam           # Main module
+│   ├── gqldt/
 │   │   ├── ffi.gleam          # FFI to Zig (via NIF)
 │   │   ├── insert.gleam       # INSERT API
 │   │   ├── select.gleam       # SELECT API
 │   │   └── types.gleam        # Gleam type definitions
 └── test/
-    └── fbqldt_test.gleam
+    └── gqldt_test.gleam
 ```
 
 **Example: Gleam API**
 ```gleam
-// bindings/gleam/src/fbqldt/types.gleam
+// bindings/gleam/src/gqldt/types.gleam
 pub type TypedValue {
   Nat(Int)
   BoundedNat(min: Int, max: Int, value: Int)
@@ -423,7 +423,7 @@ pub type PromptScores {
   )
 }
 
-// bindings/gleam/src/fbqldt/insert.gleam
+// bindings/gleam/src/gqldt/insert.gleam
 pub type InsertBuilder {
   InsertBuilder(
     table: String,
@@ -470,8 +470,8 @@ pub fn execute(
 }
 
 // Usage example
-import fbqldt/insert
-import fbqldt/types.{BoundedNat, NonEmptyString}
+import gqldt/insert
+import gqldt/types.{BoundedNat, NonEmptyString}
 
 pub fn main() {
   insert.new("evidence")
@@ -484,8 +484,8 @@ pub fn main() {
 
 **FFI via Erlang NIF:**
 ```gleam
-// bindings/gleam/src/fbqldt/ffi.gleam
-@external(erlang, "fbqldt_nif", "insert_create")
+// bindings/gleam/src/gqldt/ffi.gleam
+@external(erlang, "gqldt_nif", "insert_create")
 pub fn insert_create(
   table: String,
   columns: List(String),
@@ -493,24 +493,24 @@ pub fn insert_create(
   rationale: String,
 ) -> Result(InsertStmt, String)
 
-@external(erlang, "fbqldt_nif", "insert_execute")
+@external(erlang, "gqldt_nif", "insert_execute")
 pub fn insert_execute(stmt: InsertStmt, db: Database) -> Result(Nil, String)
 ```
 
 **Erlang NIF (C/Zig bridge):**
 ```c
-// bindings/gleam/c_src/fbqldt_nif.c
+// bindings/gleam/c_src/gqldt_nif.c
 #include <erl_nif.h>
-#include "fbqldt.h"  // From Idris2 ABI
+#include "gqldt.h"  // From Idris2 ABI
 
 static ERL_NIF_TERM insert_create(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
     // Extract Erlang terms → C types
-    // Call Zig FFI fbqldt_insert_create()
+    // Call Zig FFI gqldt_insert_create()
     // Return Erlang term
 }
 
 static ERL_NIF_TERM insert_execute(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
-    // Call Zig FFI fbqldt_insert_execute()
+    // Call Zig FFI gqldt_insert_execute()
     // Return ok/error tuple
 }
 
@@ -519,7 +519,7 @@ static ErlNifFunc nif_funcs[] = {
     {"insert_execute", 2, insert_execute},
 };
 
-ERL_NIF_INIT(fbqldt_nif, nif_funcs, NULL, NULL, NULL, NULL)
+ERL_NIF_INIT(gqldt_nif, nif_funcs, NULL, NULL, NULL, NULL)
 ```
 
 ---
@@ -535,19 +535,19 @@ ERL_NIF_INIT(fbqldt_nif, nif_funcs, NULL, NULL, NULL, NULL)
 bindings/elixir/
 ├── mix.exs
 ├── lib/
-│   ├── fbql_dt.ex             # Main module
-│   ├── fbql_dt/
+│   ├── gql_dt.ex             # Main module
+│   ├── gql_dt/
 │   │   ├── insert.ex          # INSERT API
 │   │   ├── select.ex          # SELECT API
 │   │   ├── types.ex           # Elixir type specs
 │   │   └── nif.ex             # NIF wrapper
 └── test/
-    └── fbql_dt_test.exs
+    └── gql_dt_test.exs
 ```
 
 **Example: Elixir API**
 ```elixir
-# bindings/elixir/lib/fbql_dt/types.ex
+# bindings/elixir/lib/gql_dt/types.ex
 defmodule FbqlDt.Types do
   @type typed_value ::
           {:nat, non_neg_integer()}
@@ -566,7 +566,7 @@ defmodule FbqlDt.Types do
         }
 end
 
-# bindings/elixir/lib/fbql_dt/insert.ex
+# bindings/elixir/lib/gql_dt/insert.ex
 defmodule FbqlDt.Insert do
   alias FbqlDt.Types
 
@@ -623,7 +623,7 @@ defmodule FbqlDt.MixProject do
 
   def project do
     [
-      app: :fbql_dt,
+      app: :gql_dt,
       version: "0.1.0",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
@@ -653,7 +653,7 @@ end
 **Directory Structure:**
 ```
 bindings/haskell/
-├── fbqldt.cabal
+├── gqldt.cabal
 ├── src/
 │   ├── FbqlDt.hs              # Main module
 │   ├── FbqlDt/
@@ -753,7 +753,7 @@ import Foreign.C.String (CString, withCString)
 import Foreign.C.Types (CInt(..))
 import Foreign.Ptr (Ptr)
 
-foreign import ccall "fbqldt_insert_create"
+foreign import ccall "gqldt_insert_create"
   c_insert_create ::
     CString ->        -- table
     Ptr CString ->    -- columns
@@ -815,20 +815,20 @@ export interface PromptScores {
 // bindings/deno/src/ffi.ts
 import { dlopen } from "https://deno.land/x/plug/mod.ts";
 
-const lib = await dlopen("./libfbqldt.so", {
-  fbqldt_insert_create: {
+const lib = await dlopen("./libgqldt.so", {
+  gqldt_insert_create: {
     parameters: ["buffer", "buffer", "usize", "buffer", "usize", "buffer"],
     result: "pointer",
   },
-  fbqldt_insert_execute: {
+  gqldt_insert_execute: {
     parameters: ["pointer", "pointer"],
     result: "i32",
   },
 });
 
 export const FFI = {
-  insertCreate: lib.symbols.fbqldt_insert_create,
-  insertExecute: lib.symbols.fbqldt_insert_execute,
+  insertCreate: lib.symbols.gqldt_insert_create,
+  insertExecute: lib.symbols.gqldt_insert_execute,
 };
 
 // bindings/deno/src/insert.ts

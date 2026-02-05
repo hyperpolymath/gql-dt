@@ -37,7 +37,7 @@ Typed IR (this module)
     ↓ Serialization
 CBOR bytes
     ↓ Network/Storage
-FormDB Native Execution
+Lithoglyph Native Execution
 ```
 -/
 
@@ -411,7 +411,7 @@ def optimizeIR (ir : IR) : IR :=
     - Legacy system compatibility
     - Debugging/inspection
 
-    PRIMARY execution path is native FormDB (preserves types).
+    PRIMARY execution path is native Lithoglyph (preserves types).
 -/
 -- Helper function must be defined first
 private def valueToSQL {t : TypeExpr} (v : TypedValue t) : String :=
@@ -455,7 +455,7 @@ private def lowerDeleteToSQL {schema : Schema} (stmt : IR.Delete schema) : Strin
     - Proofs are discarded
     - Type safety moves from compile-time to runtime
 
-    PRIMARY execution path is native FormDB (preserves types).
+    PRIMARY execution path is native Lithoglyph (preserves types).
 -/
 def lowerToSQL (ir : IR) : String :=
   match ir with

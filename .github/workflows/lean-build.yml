@@ -100,7 +100,7 @@ jobs:
 
       - name: Verify specification files
         run: |
-          for file in spec/FQL_Dependent_Types_Complete_Specification.md \
+          for file in spec/GQL_Dependent_Types_Complete_Specification.md \
                       spec/normalization-types.md \
                       spec/FBQLdt-Grammar.ebnf \
                       spec/FBQLdt-Lexical.md \
@@ -115,9 +115,9 @@ jobs:
       - name: Check for naming consistency
         run: |
           echo "Checking for naming inconsistencies..."
-          # Check STATE.scm and ECOSYSTEM.scm use fbql-dt not fdql-dt
+          # Check STATE.scm and ECOSYSTEM.scm use gql-dt not fdql-dt
           if grep -i "fdql-dt" STATE.scm ECOSYSTEM.scm 2>/dev/null; then
-            echo "❌ Found old naming (fdql-dt instead of fbql-dt)"
+            echo "❌ Found old naming (fdql-dt instead of gql-dt)"
             exit 1
           fi
           echo "✅ Naming is consistent"

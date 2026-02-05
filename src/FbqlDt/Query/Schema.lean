@@ -3,7 +3,7 @@
 --
 -- FqlDt.Query.Schema - Database schema definitions
 --
--- Defines table schemas, column types, and constraints for FQL type checking.
+-- Defines table schemas, column types, and constraints for GQL type checking.
 
 import FbqlDt.Types.BoundedNat
 import FbqlDt.Prompt.PromptScores
@@ -14,14 +14,14 @@ namespace FbqlDt.Query.Schema
 -- Column Types
 -- ============================================================================
 
-/-- SQL-like column types with FQL extensions -/
+/-- SQL-like column types with GQL extensions -/
 inductive ColumnType where
   | int : ColumnType
   | float : ColumnType
   | string : ColumnType
   | bool : ColumnType
   | timestamp : ColumnType
-  -- FQL extensions: bounded types with compile-time constraints
+  -- GQL extensions: bounded types with compile-time constraints
   | boundedInt : Int → Int → ColumnType      -- min, max
   | boundedNat : Nat → Nat → ColumnType      -- min, max
   | nonEmptyString : ColumnType
@@ -75,7 +75,7 @@ inductive Constraint where
   | primaryKey : Constraint
   | foreignKey : String → String → Constraint  -- table, column
   | check : String → Constraint                 -- expression as string (for display)
-  | requiresProof : Constraint                  -- FQL: requires proof for insertion
+  | requiresProof : Constraint                  -- GQL: requires proof for insertion
   deriving Repr, BEq
 
 -- ============================================================================
@@ -114,7 +114,7 @@ end Column
 structure Table where
   name : String
   columns : List Column
-  -- FQL extension: minimum PROMPT score required for insertions
+  -- GQL extension: minimum PROMPT score required for insertions
   minPromptScore : Option Nat := none
   deriving Repr
 

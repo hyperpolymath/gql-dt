@@ -188,7 +188,7 @@ def mkInsert (schema : Schema) ... (h : <proof-obligation>) : InsertStmt schema
 - User sees helpful error messages with suggestions
 
 ✅ **Four-Layer Defense**
-1. UI validation (FormDB Studio forms/dropdowns)
+1. UI validation (Lithoglyph Studio forms/dropdowns)
 2. Type inference + runtime checks (FBQL parser)
 3. Compile-time proofs (FBQLdt parser)
 4. Database constraints (final safety net)
@@ -243,7 +243,7 @@ Tag 1004: ProofBlob
 ✅ **Compact representation**
 ✅ **Schema evolution support**
 
-#### Binary (FormDB Native Storage)
+#### Binary (Lithoglyph Native Storage)
 ✅ **High-performance format**
 ```
 [Tag: 1 byte][Value data: N bytes][Proof blob: M bytes]
@@ -289,7 +289,7 @@ def fromSQLValue (sql : String) (hint : TypeExpr) : TypedValue t
 module Insert = {
   type t
 
-  @module("@fbqldt/core") @scope("Insert")
+  @module("@gqldt/core") @scope("Insert")
   external create: (
     ~table: string,
     ~columns: array<string>,
@@ -297,7 +297,7 @@ module Insert = {
     ~rationale: string,
   ) => result<t, string> = "create"
 
-  @module("@fbqldt/core") @scope("Insert")
+  @module("@gqldt/core") @scope("Insert")
   external execute: (t, ~db: Database.t) => promise<result<unit, string>> = "execute"
 }
 ```
@@ -315,17 +315,17 @@ module TypedValue = {
 
 ✅ **FFI Bridge (Zig ↔ ReScript)**
 ```rescript
-@module("@fbqldt/core") @scope("TypedValue")
+@module("@gqldt/core") @scope("TypedValue")
 external toCBOR: TypedValue.t => Js.TypedArray2.Uint8Array.t = "toCBOR"
 
-@module("@fbqldt/core") @scope("TypedValue")
+@module("@gqldt/core") @scope("TypedValue")
 external fromCBOR: Js.TypedArray2.Uint8Array.t => result<TypedValue.t, string> = "fromCBOR"
 ```
 
 #### WASM Support
 ✅ **Browser-compatible WASM module**
 ✅ **Client-side type checking**
-✅ **Offline FormDB Studio (IndexedDB)**
+✅ **Offline Lithoglyph Studio (IndexedDB)**
 ✅ **Edge computing (Cloudflare Workers, Deno Deploy)**
 
 #### Builder API
@@ -406,7 +406,7 @@ Typed AST (with proofs)
     ↓
 Typed IR (preserves dependent types)
     ↓ CBOR serialization
-FormDB Native Execution (Zig/Rust)
+Lithoglyph Native Execution (Zig/Rust)
     ↓
 Direct storage operations (no SQL)
 ```

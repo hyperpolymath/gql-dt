@@ -15,7 +15,7 @@
 
 **Your intuition:** Compiling to SQL feels like "being a purist" but might sacrifice compatibility.
 
-**TL;DR Answer:** Your intuition is **100% correct**. Compiling to SQL **destroys the type safety guarantees** that make FBQLdt valuable. **Recommendation: Compile to typed IR, execute natively on FormDB, with optional SQL backend for compatibility.**
+**TL;DR Answer:** Your intuition is **100% correct**. Compiling to SQL **destroys the type safety guarantees** that make FBQLdt valuable. **Recommendation: Compile to typed IR, execute natively on Lithoglyph, with optional SQL backend for compatibility.**
 
 ---
 
@@ -144,7 +144,7 @@ structure IR.InsertStmt (schema : Schema) where
       (values.get! i).1 = col.type
 
 -- IR can be:
--- 1. Executed directly on FormDB (native)
+-- 1. Executed directly on Lithoglyph (native)
 -- 2. Serialized to CBOR for network transport
 -- 3. Lowered to SQL if compatibility needed
 -- 4. Interpreted for debugging
@@ -156,7 +156,7 @@ structure IR.InsertStmt (schema : Schema) where
 |---------|--------|
 | **Type Preservation** | All dependent type information preserved |
 | **Proof Transport** | Proofs serialized (CBOR) and verified on server |
-| **Multiple Backends** | IR → FormDB (native), IR → SQL (compat), IR → Debug |
+| **Multiple Backends** | IR → Lithoglyph (native), IR → SQL (compat), IR → Debug |
 | **Optimization** | IR can be optimized before execution |
 | **Security** | Type-safe IR prevents SQL injection entirely |
 | **Error Messages** | IR execution can reference original FBQLdt source |
@@ -179,13 +179,13 @@ Typed IR (proofs → CBOR)
    │     │
    ↓     ↓
 Native   SQL
-FormDB   Backend
+Lithoglyph   Backend
 (best)   (compat)
 ```
 
 ---
 
-## Option 3: Native FormDB Execution (RECOMMENDED)
+## Option 3: Native Lithoglyph Execution (RECOMMENDED)
 
 ### Architecture
 
@@ -202,7 +202,7 @@ IR Generator (typed IR with proof blobs)
     ↓
 CBOR Serialization (network transport)
     ↓
-FormDB Server (Rust/Zig)
+Lithoglyph Server (Rust/Zig)
     ├─ Deserialize IR
     ├─ Validate proof blobs (optional, already checked)
     ├─ Execute on native storage
@@ -218,7 +218,7 @@ FormDB Server (Rust/Zig)
 
 **2. Performance**
 - No SQL parsing/planning overhead
-- Direct execution on FormDB storage
+- Direct execution on Lithoglyph storage
 - Proof verification at parse time, not runtime
 - Zero-copy deserialization (CBOR → Rust/Zig)
 
@@ -237,11 +237,11 @@ FormDB Server (Rust/Zig)
 - Can add features SQL doesn't support
 - Normalization operations require custom IR anyway
 
-### FormDB Native Storage Integration
+### Lithoglyph Native Storage Integration
 
 **Storage Layer (Rust/Zig):**
 ```zig
-// FormDB storage understands refined types natively
+// Lithoglyph storage understands refined types natively
 const Collection = struct {
     name: []const u8,
     columns: []Column,
@@ -267,7 +267,7 @@ const Collection = struct {
 ```
 
 **No SQL Translation Needed:**
-- FormDB storage layer speaks "dependent types" natively
+- Lithoglyph storage layer speaks "dependent types" natively
 - IR maps directly to storage operations
 - Proofs already verified, storage just executes
 
@@ -284,7 +284,7 @@ Lean 4 Parser
     ↓
 Typed IR (canonical representation)
     ↓
-    ├─ Primary Path: Native FormDB Execution (99% of queries)
+    ├─ Primary Path: Native Lithoglyph Execution (99% of queries)
     │  └─ Best performance, full type safety
     │
     ├─ Compatibility Path: SQL Backend (for BI tools)
@@ -302,7 +302,7 @@ Typed IR (canonical representation)
 def executeIR (ir : IR) (backend : Backend) : IO Result :=
   match backend with
   | .native formdb =>
-      -- Best: Native FormDB execution
+      -- Best: Native Lithoglyph execution
       formdb.execute ir
   | .sql connection =>
       -- Compatibility: Lower to SQL
@@ -317,7 +317,7 @@ def executeIR (ir : IR) (backend : Backend) : IO Result :=
 
 | Backend | Use Case | Type Safety | Performance |
 |---------|----------|-------------|-------------|
-| **Native FormDB** | Primary execution | Full | Excellent |
+| **Native Lithoglyph** | Primary execution | Full | Excellent |
 | **SQL Compat** | BI tools, legacy integration | Lost | Good |
 | **Debug** | Development, query explain | Full | Slow |
 
@@ -331,9 +331,9 @@ def executeIR (ir : IR) (backend : Backend) : IO Result :=
 
 | Approach | Parse | Type Check | Execute | Total | Type Safety |
 |----------|-------|------------|---------|-------|-------------|
-| **FBQLdt → IR → FormDB** | 50ms | 20ms | 100ms | **170ms** | ✅ Full |
+| **FBQLdt → IR → Lithoglyph** | 50ms | 20ms | 100ms | **170ms** | ✅ Full |
 | **FBQLdt → SQL → DB** | 50ms | 20ms | 200ms (parse SQL) | **270ms** | ❌ Lost |
-| **FBQL → IR → FormDB** | 30ms | 10ms (infer) | 100ms | **140ms** | ✅ Runtime |
+| **FBQL → IR → Lithoglyph** | 30ms | 10ms (infer) | 100ms | **140ms** | ✅ Runtime |
 | **Raw SQL → DB** | 10ms | 0ms | 200ms | **210ms** | ❌ None |
 
 **Key Insight:** Native IR execution is **faster** than SQL compilation because:
@@ -365,7 +365,7 @@ def insert (score : BoundedNat 0 100) : IO Unit :=
 |-----------|----------------|-------------|---------------------|
 | **Type Safety** | ❌ Lost | ✅ Full | ✅ Full (native) |
 | **Performance** | ⚠️ Slower | ✅ Faster | ✅ Faster (native) |
-| **Compatibility** | ✅ Broad | ⚠️ FormDB only | ✅ Both |
+| **Compatibility** | ✅ Broad | ⚠️ Lithoglyph only | ✅ Both |
 | **Error Messages** | ❌ Poor | ✅ Excellent | ✅ Excellent |
 | **SQL Injection** | ⚠️ Risk | ✅ Immune | ✅ Immune (native) |
 | **Maintenance** | ⚠️ Complex | ✅ Simple | ⚠️ Moderate |
@@ -378,9 +378,9 @@ def insert (score : BoundedNat 0 100) : IO Unit :=
 ### Phase 1: Native IR Only (M6-M7)
 1. Implement typed IR generation from AST
 2. CBOR serialization for proof blobs (RFC 8949)
-3. FormDB native execution engine
+3. Lithoglyph native execution engine
 4. Performance: Excellent
-5. Compatibility: FormDB only
+5. Compatibility: Lithoglyph only
 
 ### Phase 2: Add SQL Compatibility (M8+)
 1. IR → SQL lowering for read-only queries
@@ -455,10 +455,10 @@ def parseFBQL (source : String) : IO (Except ParseError IR) := do
   return ir
 ```
 
-### M6c: IR → FormDB Native Execution
+### M6c: IR → Lithoglyph Native Execution
 
 ```zig
-// FormDB executes IR natively (Zig)
+// Lithoglyph executes IR natively (Zig)
 pub fn executeIR(ir: IR, db: *Database) !Result {
     return switch (ir) {
         .insert => |stmt| try db.insert(stmt),
@@ -502,7 +502,7 @@ fn insert(db: *Database, stmt: IR.InsertStmt) !void {
 - ✅ Better error messages
 - ✅ Faster (direct execution)
 - ✅ SQL injection immune
-- ⚠️ Requires FormDB (solvable with hybrid)
+- ⚠️ Requires Lithoglyph (solvable with hybrid)
 
 **Hybrid approach (RECOMMENDED):**
 - ✅ All benefits of native IR
@@ -510,7 +510,7 @@ fn insert(db: *Database, stmt: IR.InsertStmt) !void {
 - ✅ Best of both worlds
 - ⚠️ Slightly more complex (manageable)
 
-**Decision:** Implement IR-first with native FormDB execution. Add SQL compatibility layer later if needed for BI tool integration.
+**Decision:** Implement IR-first with native Lithoglyph execution. Add SQL compatibility layer later if needed for BI tool integration.
 
 ---
 
@@ -518,7 +518,7 @@ fn insert(db: *Database, stmt: IR.InsertStmt) !void {
 1. Design IR data structures (src/FbqlDt/IR.lean)
 2. Implement AST → IR generation
 3. Design CBOR proof blob format
-4. Coordinate with FormDB team on native IR execution
+4. Coordinate with Lithoglyph team on native IR execution
 5. Update M6 Parser milestone with IR targets
 
 **This is NOT "being a purist" - it's being correct.** Dependent types with proofs require a type-preserving execution model. SQL can't represent that.
@@ -531,4 +531,4 @@ fn insert(db: *Database, stmt: IR.InsertStmt) !void {
 - `docs/PARSER-DECISION.md` - Why Lean 4 for parsing
 - `docs/TWO-TIER-DESIGN.md` - FBQLdt vs FBQL architecture
 - `docs/TYPE-SAFETY-ENFORCEMENT.md` - How type safety works
-- FormDB Zig FFI: `bridge/zig/src/main.zig`
+- Lithoglyph Zig FFI: `bridge/zig/src/main.zig`

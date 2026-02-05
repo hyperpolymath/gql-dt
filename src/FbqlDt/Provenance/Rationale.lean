@@ -11,7 +11,7 @@ open FbqlDt.Types
 
 /-- A rationale explaining why an operation was performed.
 
-Every data modification in FQLdt must include a rationale.
+Every data modification in GQLdt must include a rationale.
 This is enforced at the type level - you cannot construct
 a Tracked value without providing a non-empty rationale. -/
 structure Rationale where

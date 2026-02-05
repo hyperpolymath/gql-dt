@@ -167,7 +167,7 @@ def cborTagProofBlob : Nat := 55804
 inductive SerializationFormat where
   | json : SerializationFormat      -- Web APIs, debugging
   | cbor : SerializationFormat      -- Proof blobs, IR transport
-  | binary : SerializationFormat    -- FormDB native storage
+  | binary : SerializationFormat    -- Lithoglyph native storage
   | sql : SerializationFormat       -- SQL compatibility (WARNING: type info lost)
   deriving Repr, BEq
 

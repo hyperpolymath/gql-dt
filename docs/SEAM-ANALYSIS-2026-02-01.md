@@ -263,7 +263,7 @@ def fail {α : Type} (msg : String) : Parser α :=
 3. **Schema Registry** ⚠️ Missing
    - No runtime schema lookup mechanism
    - Hardcoded `evidenceSchema` used everywhere
-   - Coordinate with FormDB team
+   - Coordinate with Lithoglyph team
 
 ### Phase 3: Medium-Priority Correctness
 
@@ -305,7 +305,7 @@ def fail {α : Type} (msg : String) : Parser α :=
 
 **Test Commands:**
 ```bash
-cd /var/home/hyper/Documents/hyperpolymath-repos/fbql-dt
+cd /var/home/hyper/Documents/hyperpolymath-repos/gql-dt
 lake clean
 lake build
 ```
@@ -357,7 +357,7 @@ lake build
 
 ### Immediate (Before M7+M8)
 1. ✅ Run `lake build` to verify Phase 1 fixes
-2. ⚠️ Implement schema registry (coordinate with FormDB)
+2. ⚠️ Implement schema registry (coordinate with Lithoglyph)
 3. ⚠️ Complete AST → IR conversions
 4. ⚠️ Add runtime validation in deserialization
 

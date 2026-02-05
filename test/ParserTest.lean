@@ -1,7 +1,7 @@
 -- SPDX-License-Identifier: PMPL-1.0
 -- SPDX-FileCopyrightText: 2025 hyperpolymath
 --
--- ParserTest.lean - Tests for FQL Parser
+-- ParserTest.lean - Tests for GQL Parser
 --
 -- Run with: lake build && lean --run test/ParserTest.lean
 
@@ -153,7 +153,7 @@ def testSelectAdvanced : IO Unit := do
 /-- Main test runner -/
 def main : IO Unit := do
   IO.println "═══════════════════════════════════════════════"
-  IO.println "  FQL Parser Tests"
+  IO.println "  GQL Parser Tests"
   IO.println "═══════════════════════════════════════════════"
   IO.println ""
 

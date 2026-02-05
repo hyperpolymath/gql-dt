@@ -5,7 +5,7 @@
 --
 -- This module provides @[extern] declarations for the Zig FFI functions
 -- defined in bridge/fdb_insert.zig. These allow Lean 4 to call into the
--- FormDB FFI layer for proof verification and database operations.
+-- Lithoglyph FFI layer for proof verification and database operations.
 
 namespace FqlDt.FFI
 
@@ -13,7 +13,7 @@ namespace FqlDt.FFI
 -- Status Codes (mirrors FdbStatus in Zig)
 -- ============================================================================
 
-/-- Result status for FormDB operations -/
+/-- Result status for Lithoglyph operations -/
 inductive FdbStatus where
   | ok : FdbStatus
   | invalidProof : FdbStatus
@@ -209,7 +209,7 @@ def failure (status : FdbStatus) (msg : String) : InsertResult := {
 end InsertResult
 
 -- ============================================================================
--- Persistence Functions (FormDB Backend)
+-- Persistence Functions (Lithoglyph Backend)
 -- ============================================================================
 
 /-- Initialize database with null path (uses default)
@@ -256,13 +256,13 @@ opaque fdbTestFreshFFI (input : Int32) : Int32
 -- High-Level Persistence API
 -- ============================================================================
 
-/-- Initialize the FormDB backend (uses default path) -/
+/-- Initialize the Lithoglyph backend (uses default path) -/
 def initDB (_path : String := "fqldt.db") : IO FdbStatus := do
   -- Pass null pointer (0) to use default path
   -- Use IO.pure to lift the pure FFI call into IO
   pure (FdbStatus.fromInt (fdbInitFFI 0 0).toInt)
 
-/-- Close the FormDB backend -/
+/-- Close the Lithoglyph backend -/
 def closeDB : IO FdbStatus := do
   pure (FdbStatus.fromInt (fdbCloseFFI ()).toInt)
 

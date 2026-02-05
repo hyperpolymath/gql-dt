@@ -9,7 +9,7 @@
 
 ## Overview
 
-This directory contains the complete formal specification for **FBQLdt** (FormDB Query Language with Dependent Types), including grammar, semantics, examples, and visual diagrams.
+This directory contains the complete formal specification for **FBQLdt** (Lithoglyph Query Language with Dependent Types), including grammar, semantics, examples, and visual diagrams.
 
 ## Specification Documents
 
@@ -17,7 +17,7 @@ This directory contains the complete formal specification for **FBQLdt** (FormDB
 
 | Document | Purpose | Status | Lines |
 |----------|---------|--------|-------|
-| **FQL_Dependent_Types_Complete_Specification.md** | Type system, semantics, examples | ✅ Complete | 1,337 |
+| **GQL_Dependent_Types_Complete_Specification.md** | Type system, semantics, examples | ✅ Complete | 1,337 |
 | **normalization-types.md** | Functional dependencies, normal forms | ✅ Complete | 753 |
 | **FBQLdt-Grammar.ebnf** | Formal EBNF grammar | ✅ Complete | 800+ |
 | **FBQLdt-Lexical.md** | Lexical specification | ✅ Complete | 700+ |
@@ -27,7 +27,7 @@ This directory contains the complete formal specification for **FBQLdt** (FormDB
 
 | Document | Purpose | Location |
 |----------|---------|----------|
-| **WP06_Dependently_Typed_FormDB.md** | Research whitepaper | `../docs/` |
+| **WP06_Dependently_Typed_Lithoglyph.md** | Research whitepaper | `../docs/` |
 | **STATE.scm** | Project state tracking | `../` |
 | **ECOSYSTEM.scm** | Ecosystem positioning | `../` |
 
@@ -37,21 +37,21 @@ This directory contains the complete formal specification for **FBQLdt** (FormDB
 
 1. **Start with:** `FBQLdt-Grammar.ebnf` - Complete syntax
 2. **Then read:** `FBQLdt-Lexical.md` - Tokenization rules
-3. **Reference:** `FQL_Dependent_Types_Complete_Specification.md` - Type system
+3. **Reference:** `GQL_Dependent_Types_Complete_Specification.md` - Type system
 4. **Visual aid:** `FBQLdt-Railroad-Diagrams.md` - Syntax diagrams
 
 ### For Users
 
-1. **Start with:** `FQL_Dependent_Types_Complete_Specification.md` - Examples and usage
+1. **Start with:** `GQL_Dependent_Types_Complete_Specification.md` - Examples and usage
 2. **Deep dive:** `normalization-types.md` - Database normalization
 3. **Visual aid:** `FBQLdt-Railroad-Diagrams.md` - See syntax visually
-4. **Research:** `../docs/WP06_Dependently_Typed_FormDB.md` - Motivation and theory
+4. **Research:** `../docs/WP06_Dependently_Typed_Lithoglyph.md` - Motivation and theory
 
 ### For Researchers
 
-1. **Theory:** `../docs/WP06_Dependently_Typed_FormDB.md` - Dependent types for databases
-2. **Type system:** `FQL_Dependent_Types_Complete_Specification.md` (Section 2-4)
-3. **Proofs:** `FQL_Dependent_Types_Complete_Specification.md` (Section 8-9)
+1. **Theory:** `../docs/WP06_Dependently_Typed_Lithoglyph.md` - Dependent types for databases
+2. **Type system:** `GQL_Dependent_Types_Complete_Specification.md` (Section 2-4)
+3. **Proofs:** `GQL_Dependent_Types_Complete_Specification.md` (Section 8-9)
 4. **Normalization:** `normalization-types.md` - Proof-carrying evolution
 
 ## Specification Status
@@ -218,7 +218,7 @@ Quantified ::= ∀ (x : α), P x | ∃ (x : α), P x
 - [ ] Lean 4 @[extern] declarations
 - [ ] Integration tests
 
-### Phase 3: FQL Parser (📋 Milestone 6 - Blocked on M5)
+### Phase 3: GQL Parser (📋 Milestone 6 - Blocked on M5)
 
 - [ ] Parser from EBNF grammar (NOW UNBLOCKED - grammar complete!)
 - [ ] Type inference
@@ -234,14 +234,14 @@ Quantified ::= ∀ (x : α), P x | ∃ (x : α), P x
    - PROMPT scores, provenance tracking
    - Navigation paths for different audiences
 
-2. **Zotero-FormDB** - Production pilot
+2. **Zotero-Lithoglyph** - Production pilot
    - Reference manager with PROMPT scores
    - Real-world refinement type usage
 
 ### Proof Tactics
 
 ```lean
--- FormDB-specific tactics
+-- Lithoglyph-specific tactics
 formdb_bounds   -- Auto-solve bounded value proofs
 formdb_prov     -- Auto-solve provenance proofs
 formdb_prompt   -- Auto-solve PROMPT score proofs
@@ -306,8 +306,8 @@ All specification documents are licensed under **PMPL-1.0-or-later** (Palimpsest
 
 ## Contact
 
-- **Project:** FormDB Query Language with Dependent Types (FBQLdt)
-- **Repository:** https://github.com/hyperpolymath/fbql-dt
+- **Project:** Lithoglyph Query Language with Dependent Types (FBQLdt)
+- **Repository:** https://github.com/hyperpolymath/gql-dt
 - **Organization:** hyperpolymath
 - **Author:** Jonathan D.A. Jewell <jonathan.jewell@open.ac.uk>
 

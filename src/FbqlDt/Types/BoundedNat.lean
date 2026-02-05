@@ -3,7 +3,7 @@
 --
 -- FqlDt.Types.BoundedNat - Natural numbers bounded by min and max
 --
--- This is the foundational refinement type for FQLdt. A BoundedNat min max
+-- This is the foundational refinement type for GQLdt. A BoundedNat min max
 -- is a natural number n with proofs that min ≤ n and n ≤ max.
 --
 -- Example usage:

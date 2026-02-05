@@ -6,12 +6,12 @@
 version: '3.8'
 
 services:
-  fbqldt-dev:
+  gqldt-dev:
     build:
       context: .
       dockerfile: Dockerfile
-    image: fbqldt:dev
-    container_name: fbqldt-dev
+    image: gqldt:dev
+    container_name: gqldt-dev
     volumes:
       - .:/workspace
       - lean-cache:/root/.elan

@@ -19,7 +19,7 @@ Handles conversion between FBQLdt's dependent types and various storage formats:
 
 1. **CBOR (Primary)** - Binary format for proof blobs, IR transport
 2. **JSON** - For ReScript integration, web APIs, debugging
-3. **Binary** - For high-performance FormDB storage
+3. **Binary** - For high-performance Lithoglyph storage
 4. **Database-Native** - For SQL compatibility layer
 
 **Design Principles:**
@@ -419,7 +419,7 @@ def decodeCBOR (bytes : ByteArray) : Except String CBORValue := do
   .ok value
 
 -- ============================================================================
--- Binary Format (FormDB Native)
+-- Binary Format (Lithoglyph Native)
 -- ============================================================================
 
 /-- Binary format for high-performance storage

@@ -3,7 +3,7 @@
 --
 -- FqlDt.FFI - Foreign Function Interface module
 --
--- Exports the Zig FFI bridge bindings for FormDB operations.
+-- Exports the Zig FFI bridge bindings for Lithoglyph operations.
 
 import FbqlDt.FFI.Bridge
 

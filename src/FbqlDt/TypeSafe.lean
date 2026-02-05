@@ -168,7 +168,7 @@ def execute {schema : Schema} (stmt : InsertStmt schema) : IO Unit := do
   IO.println s!"Executing INSERT into {stmt.table}"
   IO.println s!"Columns: {stmt.columns}"
   IO.println s!"Rationale: {repr stmt.rationale}"
-  -- In production: serialize to FormDB FQL, send to database
+  -- In production: serialize to Lithoglyph GQL, send to database
   pure ()
 
 -- Proof that execution preserves type safety

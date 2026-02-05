@@ -1,10 +1,10 @@
 -- SPDX-License-Identifier: PMPL-1.0
 -- SPDX-FileCopyrightText: 2025 hyperpolymath
 --
--- FqlDt.Query.AST - Abstract Syntax Tree for FQL queries
+-- FqlDt.Query.AST - Abstract Syntax Tree for GQL queries
 --
--- Defines the core AST types for the FormDB Query Language.
--- FQL is designed for proof-carrying queries with provenance tracking.
+-- Defines the core AST types for the Lithoglyph Query Language.
+-- GQL is designed for proof-carrying queries with provenance tracking.
 
 import FbqlDt.Types.NonEmptyString
 import FbqlDt.Prompt.PromptScores
@@ -45,7 +45,7 @@ end QualifiedColumn
 -- Literal Values
 -- ============================================================================
 
-/-- Literal values in FQL expressions -/
+/-- Literal values in GQL expressions -/
 inductive Literal where
   | null : Literal
   | bool : Bool → Literal
@@ -85,7 +85,7 @@ inductive LogicOp where
   | or : LogicOp
   deriving Repr, BEq
 
-/-- FQL expressions -/
+/-- GQL expressions -/
 inductive Expr where
   | lit : Literal → Expr
   | col : QualifiedColumn → Expr
@@ -185,7 +185,7 @@ structure ColumnValue where
 structure InsertStmt where
   table : TableName
   values : List ColumnValue
-  -- Provenance metadata (required for FQL)
+  -- Provenance metadata (required for GQL)
   actor : Option String
   rationale : Option String
   -- Optional PROMPT score (0-100) for data quality enforcement
@@ -211,7 +211,7 @@ structure DeleteStmt where
   rationale : Option String
   deriving Repr
 
-/-- Top-level FQL statement -/
+/-- Top-level GQL statement -/
 inductive Statement where
   | select : SelectQuery → Statement
   | insert : InsertStmt → Statement

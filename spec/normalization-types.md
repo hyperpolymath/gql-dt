@@ -1,4 +1,4 @@
-# FQL-dt Normalization Types
+# GQL-dt Normalization Types
 
 **Version**: 0.1.0
 **Status**: Specification
@@ -7,7 +7,7 @@
 
 ## Overview
 
-This specification defines dependent types for encoding functional dependencies, normal forms, and proof-carrying schema normalization in FQL-dt. These types enable:
+This specification defines dependent types for encoding functional dependencies, normal forms, and proof-carrying schema normalization in GQL-dt. These types enable:
 
 - **Compile-time verification** that schemas satisfy target normal forms
 - **Proof-carrying normalization** with equivalence guarantees
@@ -21,7 +21,7 @@ This specification defines dependent types for encoding functional dependencies,
 3. [Normalization Steps](#3-normalization-steps)
 4. [Multi-Valued Dependencies](#4-multi-valued-dependencies)
 5. [Integration with Form.Normalizer](#5-integration-with-formnormalizer)
-6. [FQL Syntax Extensions](#6-fql-syntax-extensions)
+6. [GQL Syntax Extensions](#6-fql-syntax-extensions)
 7. [Complete Examples](#7-complete-examples)
 
 ---
@@ -34,7 +34,7 @@ This specification defines dependent types for encoding functional dependencies,
 /-- An attribute in a schema -/
 structure Attribute where
   name : String
-  type : FQLType
+  type : GQLType
   deriving DecidableEq
 
 /-- A set of attributes -/
@@ -142,7 +142,7 @@ def FirstNormalForm (S : Schema) : Prop :=
   ∀ attr ∈ S.attributes, attr.type.isAtomic
 
 /-- Atomic type check -/
-def FQLType.isAtomic : FQLType → Bool
+def GQLType.isAtomic : GQLType → Bool
   | .Int => true
   | .Float => true
   | .String => true
@@ -435,7 +435,7 @@ theorem fourth_nf_implies_bcnf (S : Schema) (fds : List (FunDep S)) (mvds : List
 
 ```zig
 /// Zig FFI for normalization proofs
-/// Forward: Form.Normalizer → FQL-dt (for proof verification)
+/// Forward: Form.Normalizer → GQL-dt (for proof verification)
 pub export fn fdb_verify_normalization_proof(
     db: *FdbDb,
     step_blob: [*]const u8,
@@ -444,7 +444,7 @@ pub export fn fdb_verify_normalization_proof(
     proof_len: usize,
 ) callconv(.C) FdbStatus;
 
-/// Reverse: FQL-dt → Form.Normalizer (register proof checker)
+/// Reverse: GQL-dt → Form.Normalizer (register proof checker)
 pub export fn fdb_register_normalization_verifier(
     db: *FdbDb,
     verifier: *const fn (
@@ -491,7 +491,7 @@ def verifyNormalization (step : NormalizationStep)
 
 ---
 
-## 6. FQL Syntax Extensions
+## 6. GQL Syntax Extensions
 
 ### 6.1 Schema Definition with Normal Form
 
@@ -665,7 +665,7 @@ WITH_PROOF {
 ## Appendix A: Proof Tactics
 
 ```lean
-namespace FormDB.Normalization.Tactics
+namespace Lithoglyph.Normalization.Tactics
 
 /-- Solve FD-related goals -/
 syntax "fd_tactic" : tactic
@@ -695,7 +695,7 @@ macro_rules
       | apply natural_join_inverse
       | simp [decomposeOn, SchemaTransform.forward, SchemaTransform.inverse])
 
-end FormDB.Normalization.Tactics
+end Lithoglyph.Normalization.Tactics
 ```
 
 ---
@@ -747,6 +747,6 @@ Suggestions:
 **Document Status**: Specification
 
 **See Also**:
-- [FormDB Self-Normalizing Specification](https://github.com/hyperpolymath/formdb/blob/main/spec/self-normalizing.adoc)
-- [FQL Dependent Types Complete Specification](./FQL_Dependent_Types_Complete_Specification.md)
+- [Lithoglyph Self-Normalizing Specification](https://github.com/hyperpolymath/formdb/blob/main/spec/self-normalizing.adoc)
+- [GQL Dependent Types Complete Specification](./GQL_Dependent_Types_Complete_Specification.md)
 - [Form.Normalizer Architecture](https://github.com/hyperpolymath/formdb/blob/main/ARCHITECTURE.adoc)

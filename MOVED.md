@@ -1,6 +1,6 @@
 # This Repository Has Moved
 
-**FBQLdt is now part of the [FormDB monorepo](https://github.com/hyperpolymath/formdb).**
+**FBQLdt is now part of the [Lithoglyph monorepo](https://github.com/hyperpolymath/formdb).**
 
 ## New Location
 
@@ -9,7 +9,7 @@
 
 ## Why the Move?
 
-FBQLdt (FormDB Query Language with dependent types) is the query interface for FormDB. To improve discoverability and maintenance, we've consolidated the FormDB ecosystem into a single monorepo:
+FBQLdt (Lithoglyph Query Language with dependent types) is the query interface for Lithoglyph. To improve discoverability and maintenance, we've consolidated the Lithoglyph ecosystem into a single monorepo:
 
 ```
 formdb/
@@ -22,7 +22,7 @@ formdb/
 
 ## Benefits of the Monorepo
 
-- **Single source of truth** for all FormDB components
+- **Single source of truth** for all Lithoglyph components
 - **Coordinated versioning** across query language, database, and tools
 - **Unified documentation** and examples
 - **Shared CI/CD** and dependency management
@@ -36,7 +36,7 @@ Update your imports/dependencies:
 
 **Before:**
 ```bash
-git clone https://github.com/hyperpolymath/fbql-dt
+git clone https://github.com/hyperpolymath/gql-dt
 ```
 
 **After:**
@@ -51,7 +51,7 @@ Submit PRs to the [formdb monorepo](https://github.com/hyperpolymath/formdb) ins
 
 ## This Repository's Future
 
-This repository (`fbql-dt`) will be archived and remain as a historical reference. All active development happens in the monorepo.
+This repository (`gql-dt`) will be archived and remain as a historical reference. All active development happens in the monorepo.
 
 ---
 

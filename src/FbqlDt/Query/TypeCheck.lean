@@ -1,7 +1,7 @@
 -- SPDX-License-Identifier: PMPL-1.0
 -- SPDX-FileCopyrightText: 2025 hyperpolymath
 --
--- FqlDt.Query.TypeCheck - Type checker for FQL queries
+-- FqlDt.Query.TypeCheck - Type checker for GQL queries
 --
 -- Validates queries against database schemas, ensuring:
 -- - Referenced tables exist

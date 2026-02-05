@@ -38,7 +38,7 @@ Typed IR (with proof blobs, permissions)
     ↓ 5. Serialization (optional)
 CBOR bytes / JSON
     ↓ 6. Execution
-FormDB Native or SQL Backend
+Lithoglyph Native or SQL Backend
 ```
 
 **Two Modes:**
@@ -52,8 +52,8 @@ FormDB Native or SQL Backend
 
 /-- Parsing mode -/
 inductive ParsingMode where
-  | fbqld : ParsingMode   -- Explicit types, compile-time proofs
-  | fbql : ParsingMode    -- Type inference, runtime validation
+  | gqld : ParsingMode   -- Explicit types, compile-time proofs
+  | gql : ParsingMode    -- Type inference, runtime validation
   deriving Repr, BEq
 
 /-- Pipeline configuration -/
@@ -67,7 +67,7 @@ structure PipelineConfig where
 
 /-- Default configuration for FBQL (user tier) -/
 def defaultFBQLConfig (userId roleId : String) : PipelineConfig := {
-  mode := .fbql,
+  mode := .gql,
   schema := evidenceSchema,  -- TODO: Schema registry lookup
   permissions := {
     userId := userId,
@@ -82,7 +82,7 @@ def defaultFBQLConfig (userId roleId : String) : PipelineConfig := {
 
 /-- Default configuration for FBQLdt (admin tier) -/
 def defaultFBQLdtConfig (userId roleId : String) : PipelineConfig := {
-  mode := .fbqld,
+  mode := .gqld,
   schema := evidenceSchema,
   permissions := {
     userId := userId,
@@ -119,8 +119,8 @@ def typeCheckAST (stmt : Statement) (config : PipelineConfig) : Except String St
   -- For FBQL, type inference already happened in parser
   -- For FBQLdt, verify explicit types and proofs
   match config.mode with
-  | .fbql => .ok stmt  -- Type inference done, runtime validation will catch errors
-  | .fbqld =>
+  | .gql => .ok stmt  -- Type inference done, runtime validation will catch errors
+  | .gqld =>
       -- TODO: Verify proofs
       .ok stmt
 
@@ -200,7 +200,7 @@ noncomputable def parseFBQLdt (source : String) (userId roleId : String) : Excep
 def parseAndExecute (source : String) (config : PipelineConfig) : IO (Except String Unit) := do
   match runPipeline source config with
   | .ok ir =>
-      -- TODO: Execute IR on FormDB
+      -- TODO: Execute IR on Lithoglyph
       IO.println s!"✓ Parsed successfully: {describeIR ir}"
       .ok (.ok ())
   | .error msg =>

@@ -51,7 +51,7 @@ module Insert = {
   type t
 
   // Create type-safe INSERT
-  @module("@fbqldt/core") @scope("Insert")
+  @module("@gqldt/core") @scope("Insert")
   external create: (
     ~table: string,
     ~columns: array<string>,
@@ -59,8 +59,8 @@ module Insert = {
     ~rationale: string,
   ) => result<t, string> = "create"
 
-  // Execute INSERT on FormDB
-  @module("@fbqldt/core") @scope("Insert")
+  // Execute INSERT on Lithoglyph
+  @module("@gqldt/core") @scope("Insert")
   external execute: (t, ~db: Database.t) => promise<result<unit, string>> = "execute"
 }
 
@@ -72,7 +72,7 @@ module TypedValue = {
     | PromptScores(PromptScores.t)
 
   // Convert to C-compatible representation
-  @module("@fbqldt/core") @scope("TypedValue")
+  @module("@gqldt/core") @scope("TypedValue")
   external toCBOR: t => Js.TypedArray2.Uint8Array.t = "toCBOR"
 }
 
@@ -99,7 +99,7 @@ let insertEvidence = async () => {
 
 ### 2. WASM Compatibility
 
-**Purpose:** Public-facing deployments, browser-based FormDB Studio, edge computing
+**Purpose:** Public-facing deployments, browser-based Lithoglyph Studio, edge computing
 
 **WASM Compilation Strategy:**
 ```
@@ -143,7 +143,7 @@ pub fn build(b: *std.Build) void {
     const optimize = b.standardOptimizeOption(.{});
 
     const lib = b.addSharedLibrary(.{
-        .name = "fbqldt",
+        .name = "gqldt",
         .root_source_file = .{ .path = "src/main.zig" },
         .target = target,
         .optimize = optimize,
@@ -159,20 +159,20 @@ pub fn build(b: *std.Build) void {
 - ✅ Type checking in browser
 - ✅ Query validation before server round-trip
 - ✅ Proof verification client-side (for FBQLdt tier)
-- ✅ Offline FormDB Studio (IndexedDB storage)
+- ✅ Offline Lithoglyph Studio (IndexedDB storage)
 - ✅ Edge computing (Cloudflare Workers, Deno Deploy)
 
 **Example WASM Usage:**
 ```rescript
 // Web browser or Deno
 module FbqlDtWasm = {
-  @module("@fbqldt/wasm")
+  @module("@gqldt/wasm")
   external initialize: unit => promise<unit> = "initialize"
 
-  @module("@fbqldt/wasm")
+  @module("@gqldt/wasm")
   external parseQuery: string => promise<result<IR.t, ParseError.t>> = "parseQuery"
 
-  @module("@fbqldt/wasm")
+  @module("@gqldt/wasm")
   external typeCheck: IR.t => promise<result<unit, TypeError.t>> = "typeCheck"
 }
 
@@ -185,7 +185,7 @@ let validateQuery = async (queryString: string) => {
   | Ok(ir) =>
       let checked = await FbqlDtWasm.typeCheck(ir)
       switch checked {
-      | Ok() => sendToServer(ir)  // Type-safe, send to FormDB
+      | Ok() => sendToServer(ir)  // Type-safe, send to Lithoglyph
       | Error(typeError) => showError(typeError)  // Caught client-side!
       }
   | Error(parseError) => showError(parseError)
@@ -275,7 +275,7 @@ backwardCompatible = ?proof_backward_compat
 
 **Generated C Header (from Idris2):**
 ```c
-// generated/abi/fbqldt.h
+// generated/abi/gqldt.h
 // Auto-generated from src/abi/Types.idr - DO NOT EDIT
 
 #ifndef FBQLDT_ABI_H
@@ -349,7 +349,7 @@ ffi/zig/                          # Zig FFI implementation
 ├── test/
 │   └── integration_test.zig     # FFI integration tests
 └── include/
-    └── fbqldt.h                  # Public C API (from Idris2 ABI)
+    └── gqldt.h                  # Public C API (from Idris2 ABI)
 ```
 
 **Example: Zig FFI Implementation**
@@ -357,11 +357,11 @@ ffi/zig/                          # Zig FFI implementation
 // ffi/zig/src/main.zig
 const std = @import("std");
 const c = @cImport({
-    @cInclude("fbqldt.h");  // Generated from Idris2 ABI
+    @cInclude("gqldt.h");  // Generated from Idris2 ABI
 });
 
 // FFI: Create INSERT statement
-export fn fbqldt_insert_create(
+export fn gqldt_insert_create(
     table: [*:0]const u8,
     columns: [*]const [*:0]const u8,
     column_count: usize,
@@ -388,8 +388,8 @@ export fn fbqldt_insert_create(
     return stmt;
 }
 
-// FFI: Execute INSERT on FormDB
-export fn fbqldt_insert_execute(
+// FFI: Execute INSERT on Lithoglyph
+export fn gqldt_insert_execute(
     stmt: *c.FbqlDt_InsertStmt,
     db: *c.FbqlDt_Database,
 ) callconv(.C) c_int {
@@ -409,13 +409,13 @@ export fn fbqldt_insert_execute(
 }
 
 // FFI: Free INSERT statement
-export fn fbqldt_insert_free(stmt: *c.FbqlDt_InsertStmt) callconv(.C) void {
+export fn gqldt_insert_free(stmt: *c.FbqlDt_InsertStmt) callconv(.C) void {
     const allocator = std.heap.c_allocator;
     allocator.destroy(stmt);
 }
 
 // FFI: Type check query
-export fn fbqldt_typecheck(
+export fn gqldt_typecheck(
     query: [*:0]const u8,
     schema: *const c.FbqlDt_Schema,
     error_buffer: [*]u8,
@@ -424,7 +424,7 @@ export fn fbqldt_typecheck(
     // Call Lean 4 type checker via C FFI
     // (Lean 4 compiles to C, provides extern symbols)
 
-    const result = lean_fbqldt_typecheck(query, schema);
+    const result = lean_gqldt_typecheck(query, schema);
 
     if (result.ok) {
         return 0;  // Type check passed
@@ -439,7 +439,7 @@ export fn fbqldt_typecheck(
 }
 
 // Lean 4 extern declaration (from Lean's C backend)
-extern fn lean_fbqldt_typecheck(
+extern fn lean_gqldt_typecheck(
     query: [*:0]const u8,
     schema: *const c.FbqlDt_Schema,
 ) callconv(.C) struct {
@@ -499,7 +499,7 @@ zig build -Dtarget=wasm32-wasi
 └────┬────────────────────────────────────┬───────────────┘
      ↓                                    ↓
 ┌─────────────────┐              ┌──────────────────────┐
-│ ReScript        │              │ FormDB Native        │
+│ ReScript        │              │ Lithoglyph Native        │
 │ Bindings        │              │ Execution (Rust/Zig) │
 │ (Web/Node/Deno) │              │                      │
 └─────────────────┘              └──────────────────────┘
@@ -545,7 +545,7 @@ zig build -Dtarget=wasm32-wasi
 - [ ] Browser-compatible WASM module
 - [ ] JavaScript/ReScript glue code
 - [ ] Client-side type checking
-- [ ] Offline FormDB Studio (IndexedDB)
+- [ ] Offline Lithoglyph Studio (IndexedDB)
 - [ ] Edge computing examples (Cloudflare Workers)
 
 ---

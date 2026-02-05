@@ -1,9 +1,9 @@
 -- SPDX-License-Identifier: PMPL-1.0
 -- SPDX-FileCopyrightText: 2025 hyperpolymath
 --
--- FqlDt.Query.Parser - Parser combinators for FQL
+-- FqlDt.Query.Parser - Parser combinators for GQL
 --
--- Simple monadic parser for the FormDB Query Language.
+-- Simple monadic parser for the Lithoglyph Query Language.
 -- Supports SELECT, INSERT, UPDATE, DELETE with provenance metadata.
 
 import FbqlDt.Query.AST
@@ -383,7 +383,7 @@ def insertStmt : Parser InsertStmt := do
   let table ← identifier
   keyword "SET"
   let values ← sepBy1 columnValuePair (symbol ",")
-  -- Optional provenance metadata (FQL extension)
+  -- Optional provenance metadata (GQL extension)
   let actor ← optional (do keyword "ACTOR"; anyStringLiteral)
   let rationale ← optional (do keyword "RATIONALE"; anyStringLiteral)
   -- Optional PROMPT score for data quality enforcement
@@ -428,7 +428,7 @@ def deleteStmt : Parser DeleteStmt := do
     rationale := rationale
   }
 
-/-- Parse any FQL statement -/
+/-- Parse any GQL statement -/
 def statement : Parser Statement := do
   let _ ← ws
   (do let q ← selectQuery; Pure.pure (Statement.select q)) <|>
@@ -442,7 +442,7 @@ end Parser
 -- Public API
 -- ============================================================================
 
-/-- Parse an FQL statement from a string -/
+/-- Parse an GQL statement from a string -/
 def parse (input : String) : Except String Statement :=
   Parser.run Parser.statement input
 

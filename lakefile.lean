@@ -1,7 +1,7 @@
 -- SPDX-License-Identifier: PMPL-1.0
 -- SPDX-FileCopyrightText: 2025 hyperpolymath
 --
--- lakefile.lean - Lake build configuration for FQLdt
+-- lakefile.lean - Lake build configuration for GQLdt
 
 import Lake
 open Lake DSL
@@ -38,7 +38,7 @@ lean_exe parser_test where
   srcDir := "test"
   root := `ParserTest
 
--- FQLdt CLI/REPL (with FFI persistence backend)
+-- GQLdt CLI/REPL (with FFI persistence backend)
 lean_exe fqldt where
   srcDir := "src"
   root := `Main

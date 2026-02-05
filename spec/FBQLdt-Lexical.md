@@ -592,11 +592,11 @@ by simp [rule1, rule2]; omega
 
 ## 13. Compatibility Notes
 
-### 13.1 Standard FQL Compatibility
+### 13.1 Standard GQL Compatibility
 
-FBQLdt is a **superset** of standard FormDB FQL:
+FBQLdt is a **superset** of standard Lithoglyph GQL:
 
-- **All standard FQL keywords** are recognized
+- **All standard GQL keywords** are recognized
 - **Type annotations** are optional (inferred if omitted)
 - **Proof clauses** are optional (auto-generated or admitted)
 
@@ -677,4 +677,4 @@ On lexical error:
 
 **See Also:**
 - `FBQLdt-Grammar.ebnf` - Formal EBNF grammar
-- `FQL_Dependent_Types_Complete_Specification.md` - Type system specification
+- `GQL_Dependent_Types_Complete_Specification.md` - Type system specification

@@ -4,7 +4,7 @@
 -- FqlDt.Provenance.Tracked - Values with provenance tracking
 --
 -- A Tracked value wraps any type with mandatory provenance:
--- who added it, when, and why. This is the core of FQLdt's
+-- who added it, when, and why. This is the core of GQLdt's
 -- type-enforced provenance tracking.
 
 import FbqlDt.Provenance.ActorId
@@ -39,7 +39,7 @@ end Timestamp
 
 /-- A value wrapped with full provenance information.
 
-Every value in a provenance-tracked FQLdt collection is wrapped
+Every value in a provenance-tracked GQLdt collection is wrapped
 in this structure. The type system ensures that:
 1. Every value has an associated actor (who created it)
 2. Every value has a timestamp (when it was created)

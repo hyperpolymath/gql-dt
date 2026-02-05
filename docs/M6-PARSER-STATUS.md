@@ -16,7 +16,7 @@ Milestone 6 (FBQLdt/FBQL Parser) has been substantially completed. The parser in
 
 **Status:** 100% Complete
 
-- **Token Types:** 80+ keywords (SQL, type, proof, FormDB)
+- **Token Types:** 80+ keywords (SQL, type, proof, Lithoglyph)
 - **Operators:** 11 precedence levels
 - **Literals:** Nat, Int, Float, String, Bool
 - **Identifiers:** Unicode support (XID_Start, XID_Continue)
@@ -116,7 +116,7 @@ def inferInsert (schema : Schema) (table : String) (columns : List String) (valu
 - **TODO:** Full JSON parser
 
 **Binary Format:** ✅
-- High-performance FormDB native storage
+- High-performance Lithoglyph native storage
 - Type tags with little-endian encoding
 - Proof blob support
 
@@ -174,14 +174,14 @@ def inferInsert (schema : Schema) (table : String) (columns : List String) (valu
 6. **Serialize** - IR → CBOR/JSON/Binary
 
 **Pipeline Configuration:** ✅
-- `ParsingMode` - fbqld (explicit types), fbql (inferred types)
+- `ParsingMode` - gqld (explicit types), gql (inferred types)
 - `ValidationLevel` - none, runtime, compile, paranoid
 - `SerializationFormat` - json, cbor, binary, sql
 
 **Convenience Functions:** ✅
 - `parseFBQL` - User tier (type inference)
 - `parseFBQLdt` - Admin tier (explicit types)
-- `parseAndExecute` - Parse + execute on FormDB
+- `parseAndExecute` - Parse + execute on Lithoglyph
 
 **Error Reporting:** ✅
 - `PipelineError` with line, column, source context
@@ -207,7 +207,7 @@ def inferInsert (schema : Schema) (table : String) (columns : List String) (valu
 1. **Schema Registry Integration** (5%)
    - Implement runtime schema lookup
    - Required for AST → IR conversion
-   - Coordinate with FormDB team
+   - Coordinate with Lithoglyph team
 
 2. **AST → IR Conversion** (5%)
    - `InferredInsert → IR.Insert` (needs schema)
@@ -267,22 +267,22 @@ def inferInsert (schema : Schema) (table : String) (columns : List String) (valu
 
 ---
 
-## Integration with FormDB
+## Integration with Lithoglyph
 
 ### Required Coordination
 
 1. **Schema Registry**
-   - FormDB must expose schema lookup API
+   - Lithoglyph must expose schema lookup API
    - FBQLdt parser needs runtime schema access
    - Format: `getSchema (tableName : String) : IO (Option Schema)`
 
 2. **Native IR Execution**
-   - FormDB must implement IR executor
+   - Lithoglyph must implement IR executor
    - Input: CBOR-serialized IR
    - Output: Query results + proof verification status
 
 3. **Permission Enforcement**
-   - FormDB must store user permission profiles
+   - Lithoglyph must store user permission profiles
    - PermissionMetadata validated on IR submission
    - Type whitelists enforced at database level
 
@@ -328,7 +328,7 @@ def inferInsert (schema : Schema) (table : String) (columns : List String) (valu
    - Deno/JS (dlopen FFI)
    - Gleam/Elixir (Erlang NIF)
 
-7. **FormDB Integration**
+7. **Lithoglyph Integration**
    - Coordinate schema registry
    - Native IR executor
    - Permission system integration
@@ -351,9 +351,9 @@ def inferInsert (schema : Schema) (table : String) (columns : List String) (valu
 
 ## Conclusion
 
-**M6 Parser is substantially complete (85%).** The core parsing infrastructure is feature-complete, with full CBOR encoding/decoding, type inference, and IR generation. The remaining 15% consists of schema registry integration and AST→IR conversion stubs, which require coordination with the FormDB team.
+**M6 Parser is substantially complete (85%).** The core parsing infrastructure is feature-complete, with full CBOR encoding/decoding, type inference, and IR generation. The remaining 15% consists of schema registry integration and AST→IR conversion stubs, which require coordination with the Lithoglyph team.
 
-**Recommended Next Action:** Proceed with M7 (Idris2 ABI) + M8 (Zig FFI) in parallel while coordinating with FormDB team on schema registry requirements.
+**Recommended Next Action:** Proceed with M7 (Idris2 ABI) + M8 (Zig FFI) in parallel while coordinating with Lithoglyph team on schema registry requirements.
 
 ---
 

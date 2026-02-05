@@ -126,7 +126,7 @@ INSERT INTO evidence (prompt_provenance) VALUES (150);
 
 ### Solution: Multi-Level Defense
 
-**Level 1: UI Validation (FormDB Studio)**
+**Level 1: UI Validation (Lithoglyph Studio)**
 ```typescript
 // Dropdown with only valid values
 <Select name="prompt_provenance">
@@ -161,11 +161,11 @@ omega tactic: can't prove 150 ≤ 100
 COMPILE ERROR (query never generated)
 ```
 
-**Level 4: Database Constraints (FormDB)**
+**Level 4: Database Constraints (Lithoglyph)**
 ```
 Even if all above fail (shouldn't happen):
   ↓
-FormDB checks: 150 in [0, 100]?
+Lithoglyph checks: 150 in [0, 100]?
   ↓
 Constraint violation
   ↓
@@ -400,7 +400,7 @@ theorem wellTyped_no_runtime_errors
 
 **A: Four-layer defense:**
 
-1. **UI layer** - FormDB Studio uses forms/dropdowns (users can't type invalid values)
+1. **UI layer** - Lithoglyph Studio uses forms/dropdowns (users can't type invalid values)
 2. **FBQL layer** - Type inference + runtime validation (errors before commit)
 3. **FBQLdt layer** - Compile-time proofs (queries won't even run if invalid)
 4. **Database layer** - Final constraint checks (safety net)

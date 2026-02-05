@@ -1,18 +1,18 @@
-# FQLdt: Dependently-Typed FormDB Query Language
+# GQLdt: Dependently-Typed Lithoglyph Query Language
 
 image:https://img.shields.io/badge/License-PMPL--1.0-blue.svg[License: PMPL-1.0,link="https://github.com/hyperpolymath/palimpsest-license"]
 // SPDX-License-Identifier: PMPL-1.0-or-later
 // SPDX-FileCopyrightText: 2025 hyperpolymath
 
-FQLdt extends [FormDB](https://github.com/hyperpolymath/formdb)'s query language with **dependent types**, enabling compile-time verification of database constraints, provenance tracking, and reversibility proofs.
+GQLdt extends [Lithoglyph](https://github.com/hyperpolymath/formdb)'s query language with **dependent types**, enabling compile-time verification of database constraints, provenance tracking, and reversibility proofs.
 
-> **Note**: FQL stands for "FormDB Query Language"—the native query interface for FormDB. It is not related to HTML forms or form builders.
+> **Note**: GQL stands for "Lithoglyph Query Language"—the native query interface for Lithoglyph. It is not related to HTML forms or form builders.
 
-## Relationship to FormDB
+## Relationship to Lithoglyph
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  FQL (Factor)                  │  FQLdt (Lean 4)            │
+│  GQL (Factor)                  │  GQLdt (Lean 4)            │
 │  - Runtime constraint checks   │  - Compile-time proofs     │
 │  - Dynamic, practical          │  - Static, verified        │
 │  - "Just run it"               │  - "Prove it first"        │
@@ -31,7 +31,7 @@ FQLdt extends [FormDB](https://github.com/hyperpolymath/formdb)'s query language
 
 **Same database, different guarantees:**
 
-| Aspect | FQL (practical) | FQLdt (verified) |
+| Aspect | GQL (practical) | GQLdt (verified) |
 |--------|-----------------|------------------|
 | When constraints checked | Runtime | Compile-time |
 | Invalid insert | Runtime error | Won't compile |
@@ -46,7 +46,7 @@ FQLdt extends [FormDB](https://github.com/hyperpolymath/formdb)'s query language
 - **Proof Obligations**: Compile-time verification of constraints
 - **Reversibility Proofs**: Prove operations have inverses before execution
 - **Normalization Types**: Type-encoded functional dependencies, normal form predicates (1NF-BCNF), proof-carrying schema evolution
-- **Backward Compatible**: Standard FQL is valid in dependent-type mode
+- **Backward Compatible**: Standard GQL is valid in dependent-type mode
 
 ## Current Status
 
@@ -87,7 +87,7 @@ For detailed progress tracking, see [.machine_readable/STATE.scm](.machine_reada
 
 ## Zig FFI (Bidirectional)
 
-FQLdt compiles to operations on Form.Bridge, which uses Zig's stable ABI:
+GQLdt compiles to operations on Form.Bridge, which uses Zig's stable ABI:
 
 ```zig
 /// Bidirectional FFI: Lean 4 → Zig → Forth core
@@ -99,7 +99,7 @@ pub const FdbStatus = struct {
     error_len: usize,
 };
 
-/// Forward: FQLdt → Form.Bridge
+/// Forward: GQLdt → Form.Bridge
 pub export fn fdb_insert(
     db: *FdbDb,
     collection: [*:0]const u8,
@@ -109,7 +109,7 @@ pub export fn fdb_insert(
     proof_len: usize,
 ) callconv(.C) FdbStatus;
 
-/// Reverse: Form.Bridge → FQLdt (for constraint checking)
+/// Reverse: Form.Bridge → GQLdt (for constraint checking)
 pub export fn fdb_register_constraint_checker(
     db: *FdbDb,
     checker: *const fn (doc: [*]const u8, len: usize) callconv(.C) bool,
@@ -120,7 +120,7 @@ No C headers or libc required. Zig provides C-compatible calling convention for 
 
 ## Specification
 
-See [spec/FQL_Dependent_Types_Complete_Specification.md](spec/FQL_Dependent_Types_Complete_Specification.md) for the full specification covering:
+See [spec/GQL_Dependent_Types_Complete_Specification.md](spec/GQL_Dependent_Types_Complete_Specification.md) for the full specification covering:
 
 1. Type System (universes, primitives, constructors)
 2. Refinement Types (bounded values, non-empty strings)
@@ -135,7 +135,7 @@ See [spec/normalization-types.md](spec/normalization-types.md) for normalization
 2. Normal form predicates (1NF, 2NF, 3NF, BCNF, 4NF)
 3. Proof-carrying schema evolution (NormalizationStep)
 4. Integration with Form.Normalizer
-5. FQL syntax extensions for normalization commands
+5. GQL syntax extensions for normalization commands
 
 ## Setup
 
@@ -152,10 +152,10 @@ See [spec/normalization-types.md](spec/normalization-types.md) for normalization
 
 ## See Also
 
-- [FormDB](https://github.com/hyperpolymath/formdb) - The narrative-first database
-- [FormDB Self-Normalizing Spec](https://github.com/hyperpolymath/formdb/blob/main/spec/self-normalizing.adoc) - Self-normalizing database specification
-- [FormDB Studio](https://github.com/hyperpolymath/formdb-studio) - Zero-friction GUI for FQLdt
+- [Lithoglyph](https://github.com/hyperpolymath/formdb) - The narrative-first database
+- [Lithoglyph Self-Normalizing Spec](https://github.com/hyperpolymath/formdb/blob/main/spec/self-normalizing.adoc) - Self-normalizing database specification
+- [Lithoglyph Studio](https://github.com/hyperpolymath/formdb-studio) - Zero-friction GUI for GQLdt
 - [BoFIG](https://github.com/hyperpolymath/bofig) - Evidence graph for investigative journalism
-- [Zotero-FormDB](https://github.com/hyperpolymath/zotero-formdb) - Production pilot: reference manager with PROMPT scores
-- [FormDB Debugger](https://github.com/hyperpolymath/formdb-debugger) - Proof-carrying database debugger (Lean 4 + Idris 2)
+- [Zotero-Lithoglyph](https://github.com/hyperpolymath/zotero-formdb) - Production pilot: reference manager with PROMPT scores
+- [Lithoglyph Debugger](https://github.com/hyperpolymath/formdb-debugger) - Proof-carrying database debugger (Lean 4 + Idris 2)
 - [FormBase](https://github.com/hyperpolymath/formbase) - Open-source Airtable alternative with provenance

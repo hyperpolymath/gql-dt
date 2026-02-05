@@ -1,7 +1,7 @@
 -- SPDX-License-Identifier: PMPL-1.0-or-later
 -- SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (@hyperpolymath)
 --
--- FBQLdt - FormDB Query Language with Dependent Types
+-- FBQLdt - Lithoglyph Query Language with Dependent Types
 --
 -- This module provides compile-time verification of database constraints
 -- through dependent types, enabling:

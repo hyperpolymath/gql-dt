@@ -48,7 +48,7 @@
                        ├─ Both execute on ──→
                        │
 ┌──────────────────────▼──────────────────────────────────────┐
-│  FormDB Runtime                                              │
+│  Lithoglyph Runtime                                              │
 │  - Stores data with constraints                              │
 │  - Enforces invariants at runtime                            │
 │  - Accepts queries from both tiers                           │
@@ -126,7 +126,7 @@ RATIONALE 'Official statistics';
 
 ## How They Interact: Compilation Strategy
 
-### FBQL → FBQLdt → FormDB
+### FBQL → FBQLdt → Lithoglyph
 
 ```
 User writes FBQL
@@ -255,7 +255,7 @@ ASSIST QUERY 3 WITH_PROOF { ... };  -- Provide proof, then execute
 **Instead of letting users write raw SQL:**
 
 ```typescript
-// FormDB Studio: Web UI with type-safe form
+// Lithoglyph Studio: Web UI with type-safe form
 interface EvidenceForm {
   title: string  // Auto-validated: non-empty
   promptProvenance: number  // Auto-validated: 0-100 with slider
@@ -350,7 +350,7 @@ INSERT INTO evidence (prompt_provenance) VALUES (150);
 
 **Estimated:** 4-6 months
 
-### Phase 4: FormDB Studio UI (Future)
+### Phase 4: Lithoglyph Studio UI (Future)
 - [ ] Web-based form builder
 - [ ] Type-safe form generation
 - [ ] Visual query builder
@@ -392,7 +392,7 @@ INSERT INTO evidence (prompt_provenance) VALUES (150);
    - Auto-fix for permissive mode
 
 3. **UI/Forms**
-   - FormDB Studio
+   - Lithoglyph Studio
    - Template-based entry
    - Zero SQL for end users
 
@@ -516,7 +516,7 @@ WITH_PROOF {
 1. **Transaction validation** - Invalid queries don't commit
 2. **Permission levels** - Users get runtime validation
 3. **Admin review queue** - Optional approval workflow
-4. **Template-based UI** - FormDB Studio (no raw SQL)
+4. **Template-based UI** - Lithoglyph Studio (no raw SQL)
 5. **Gradual strictness** - Permissive/strict/paranoid modes
 
 ### Timeline
@@ -762,7 +762,7 @@ Executing INSERT...
 ### Form-Based UI Respects Permissions
 
 ```typescript
-// FormDB Studio auto-hides fields based on permissions
+// Lithoglyph Studio auto-hides fields based on permissions
 function renderEvidenceForm(user: User, profile: PermissionProfile) {
   const schema = getSchema("evidence");
   const allowedColumns = filterSchemaForUser(schema, profile);

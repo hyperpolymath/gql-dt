@@ -51,7 +51,7 @@ inductive TokenType where
   | kwWithProof | kwTheorem | kwProof | kwQed
   | kwOmega | kwDecide | kwSimp | kwSorry
 
-  -- FormDB Keywords
+  -- Lithoglyph Keywords
   | kwTarget | kwNormalForm | kwNormalize
   | kwPermissions | kwGrant | kwRevoke | kwTo
   | kwValidation | kwLevel | kwRuntime | kwCompile

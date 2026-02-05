@@ -1,7 +1,7 @@
 -- SPDX-License-Identifier: PMPL-1.0
 -- SPDX-FileCopyrightText: 2025 hyperpolymath
 --
--- FqlDt.Query.Store - In-memory data store for FQL
+-- FqlDt.Query.Store - In-memory data store for GQL
 --
 -- Provides a simple in-memory storage backend for query execution.
 -- Each value is tracked with provenance and PROMPT scores.

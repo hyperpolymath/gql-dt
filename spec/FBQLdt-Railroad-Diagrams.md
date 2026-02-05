@@ -553,4 +553,4 @@ spec/diagrams/
 **See Also:**
 - `FBQLdt-Grammar.ebnf` - Formal EBNF grammar source
 - `FBQLdt-Lexical.md` - Lexical specification
-- `FQL_Dependent_Types_Complete_Specification.md` - Type system spec
+- `GQL_Dependent_Types_Complete_Specification.md` - Type system spec

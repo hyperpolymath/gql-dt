@@ -12,7 +12,7 @@ namespace FbqlDt.Types
 /-- A confidence value between 0.0 and 1.0.
 
 This is the standard type for expressing confidence levels,
-probabilities, or certainty in FQLdt. -/
+probabilities, or certainty in GQLdt. -/
 structure Confidence where
   /-- The underlying float value (guaranteed 0.0 ≤ val ≤ 1.0) -/
   val : Float

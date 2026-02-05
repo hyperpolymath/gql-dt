@@ -1,7 +1,7 @@
 -- SPDX-License-Identifier: PMPL-1.0
 -- SPDX-FileCopyrightText: 2025 hyperpolymath
 --
--- FqlDt.Query.Eval - Query evaluation engine for FQL
+-- FqlDt.Query.Eval - Query evaluation engine for GQL
 --
 -- Executes type-checked queries against an in-memory store.
 -- Enforces proof requirements and tracks provenance.

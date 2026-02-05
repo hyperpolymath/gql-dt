@@ -19,11 +19,11 @@ import Data.Buffer
 
 ||| Initialize FBQLdt library
 ||| Returns: Status code
-%foreign "C:fbqldt_init,libfbqldt"
+%foreign "C:gqldt_init,libgqldt"
 prim__init : PrimIO Int32
 
 ||| Cleanup FBQLdt library
-%foreign "C:fbqldt_cleanup,libfbqldt"
+%foreign "C:gqldt_cleanup,libgqldt"
 prim__cleanup : PrimIO ()
 
 ||| Create database handle
@@ -31,13 +31,13 @@ prim__cleanup : PrimIO ()
 ||| @ path_len Path length in bytes
 ||| @ db_out Output parameter for database handle
 ||| Returns: Status code
-%foreign "C:fbqldt_db_open,libfbqldt"
+%foreign "C:gqldt_db_open,libgqldt"
 prim__db_open : (path : String) -> (path_len : Bits64) -> (db_out : AnyPtr) -> PrimIO Int32
 
 ||| Close database handle
 ||| @ db Database handle to close
 ||| Returns: Status code
-%foreign "C:fbqldt_db_close,libfbqldt"
+%foreign "C:gqldt_db_close,libgqldt"
 prim__db_close : (db : AnyPtr) -> PrimIO Int32
 
 ||| Parse FBQLdt query string
@@ -45,7 +45,7 @@ prim__db_close : (db : AnyPtr) -> PrimIO Int32
 ||| @ query_len Query length
 ||| @ query_out Output parameter for query handle
 ||| Returns: Status code
-%foreign "C:fbqldt_parse,libfbqldt"
+%foreign "C:gqldt_parse,libgqldt"
 prim__parse : (query_str : String) -> (query_len : Bits64) -> (query_out : AnyPtr) -> PrimIO Int32
 
 ||| Parse FBQL query string (with type inference)
@@ -54,14 +54,14 @@ prim__parse : (query_str : String) -> (query_len : Bits64) -> (query_out : AnyPt
 ||| @ schema Schema handle for type inference
 ||| @ query_out Output parameter for query handle
 ||| Returns: Status code
-%foreign "C:fbqldt_parse_inferred,libfbqldt"
+%foreign "C:gqldt_parse_inferred,libgqldt"
 prim__parse_inferred : (query_str : String) -> (query_len : Bits64) -> (schema : AnyPtr) -> (query_out : AnyPtr) -> PrimIO Int32
 
 ||| Type-check query
 ||| @ query Query handle
 ||| @ schema Schema handle
 ||| Returns: Status code (StatusOk if types match, StatusTypeMismatch otherwise)
-%foreign "C:fbqldt_typecheck,libfbqldt"
+%foreign "C:gqldt_typecheck,libgqldt"
 prim__typecheck : (query : AnyPtr) -> (schema : AnyPtr) -> PrimIO Int32
 
 ||| Execute query
@@ -69,7 +69,7 @@ prim__typecheck : (query : AnyPtr) -> (schema : AnyPtr) -> PrimIO Int32
 ||| @ query Query handle
 ||| @ result_out Output parameter for result set
 ||| Returns: Status code
-%foreign "C:fbqldt_execute,libfbqldt"
+%foreign "C:gqldt_execute,libgqldt"
 prim__execute : (db : AnyPtr) -> (query : AnyPtr) -> (result_out : AnyPtr) -> PrimIO Int32
 
 ||| Serialize query to CBOR
@@ -78,19 +78,19 @@ prim__execute : (db : AnyPtr) -> (query : AnyPtr) -> (result_out : AnyPtr) -> Pr
 ||| @ buffer_len Buffer capacity
 ||| @ written_out Bytes written
 ||| Returns: Status code
-%foreign "C:fbqldt_serialize_cbor,libfbqldt"
+%foreign "C:gqldt_serialize_cbor,libgqldt"
 prim__serialize_cbor : (query : AnyPtr) -> (buffer : AnyPtr) -> (buffer_len : Bits64) -> (written_out : AnyPtr) -> PrimIO Int32
 
 ||| Serialize query to JSON
-%foreign "C:fbqldt_serialize_json,libfbqldt"
+%foreign "C:gqldt_serialize_json,libgqldt"
 prim__serialize_json : (query : AnyPtr) -> (buffer : AnyPtr) -> (buffer_len : Bits64) -> (written_out : AnyPtr) -> PrimIO Int32
 
 ||| Deserialize query from CBOR
-%foreign "C:fbqldt_deserialize_cbor,libfbqldt"
+%foreign "C:gqldt_deserialize_cbor,libgqldt"
 prim__deserialize_cbor : (buffer : AnyPtr) -> (buffer_len : Bits64) -> (query_out : AnyPtr) -> PrimIO Int32
 
 ||| Get schema from database
-%foreign "C:fbqldt_get_schema,libfbqldt"
+%foreign "C:gqldt_get_schema,libgqldt"
 prim__get_schema : (db : AnyPtr) -> (collection_name : String) -> (schema_out : AnyPtr) -> PrimIO Int32
 
 ||| Validate permissions
@@ -98,15 +98,15 @@ prim__get_schema : (db : AnyPtr) -> (collection_name : String) -> (schema_out : 
 ||| @ user_id User identifier
 ||| @ permissions Permission whitelist
 ||| Returns: Status code (StatusOk if allowed, StatusPermissionDenied otherwise)
-%foreign "C:fbqldt_validate_permissions,libfbqldt"
+%foreign "C:gqldt_validate_permissions,libgqldt"
 prim__validate_permissions : (query : AnyPtr) -> (user_id : String) -> (permissions : AnyPtr) -> PrimIO Int32
 
 ||| Free query handle
-%foreign "C:fbqldt_query_free,libfbqldt"
+%foreign "C:gqldt_query_free,libgqldt"
 prim__query_free : (query : AnyPtr) -> PrimIO ()
 
 ||| Free schema handle
-%foreign "C:fbqldt_schema_free,libfbqldt"
+%foreign "C:gqldt_schema_free,libgqldt"
 prim__schema_free : (schema : AnyPtr) -> PrimIO ()
 
 --------------------------------------------------------------------------------

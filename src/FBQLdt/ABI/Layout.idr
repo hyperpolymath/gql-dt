@@ -87,6 +87,7 @@ boundedNatSize = 8  -- u64 in Zig
 ||| Proof that BoundedNat has zero runtime overhead from proofs
 public export
 0 boundedNatZeroOverhead : boundedNatSize = 8
+-- PROOF_TODO: Replace believe_me with actual proof
 boundedNatZeroOverhead = believe_me ()
 
 ||| Size of NonEmptyString in memory (pointer + length)
@@ -107,6 +108,7 @@ promptScoresSize = 7 * 8  -- 7 u64 values
 ||| Proof that PromptScores is tightly packed
 public export
 0 promptScoresPackingCorrect : promptScoresSize = 56
+-- PROOF_TODO: Replace believe_me with actual proof
 promptScoresPackingCorrect = believe_me ()
 
 --------------------------------------------------------------------------------
@@ -121,11 +123,13 @@ Aligned8 n = So (n `mod` 8 == 0)
 ||| Proof that BoundedNat is 8-byte aligned
 public export
 0 boundedNatAligned : Aligned8 boundedNatSize
+-- PROOF_TODO: Replace believe_me with actual proof
 boundedNatAligned = believe_me () -- TODO: Prove 8 mod 4 == 0
 
 ||| Proof that PromptScores is 8-byte aligned
 public export
 0 promptScoresAligned : Aligned8 promptScoresSize
+-- PROOF_TODO: Replace believe_me with actual proof
 promptScoresAligned = believe_me () -- TODO: Prove 24 mod 4 == 0
 
 --------------------------------------------------------------------------------
@@ -164,6 +168,7 @@ maxCborPromptScores = 1 + 3 + (7 * maxCborBoundedNat)  -- tag + map header + 7 s
 ||| Proof that CBOR encoding is bounded
 public export
 0 cborEncodingBounded : So (maxCborPromptScores < 200)
+-- PROOF_TODO: Replace believe_me with actual proof
 cborEncodingBounded = believe_me Oh
 
 --------------------------------------------------------------------------------
@@ -180,6 +185,7 @@ data ABIVersion : Type where
 ||| Proof that v1.1 is backward compatible with v1.0
 public export
 0 v1_1_backcompat : (f : ABIVersion -> Nat) -> So (f ABIv1_1 >= f ABIv1_0)
+-- PROOF_TODO: Replace believe_me with actual proof
 v1_1_backcompat f = believe_me Oh
 
 ||| Proof that struct sizes are stable across minor versions

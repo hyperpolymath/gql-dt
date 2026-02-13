@@ -12,3 +12,6 @@ build/
 *~
 .zig-cache/
 zig-out/
+
+# Crash recovery artifacts
+ai-cli-crash-capture/
